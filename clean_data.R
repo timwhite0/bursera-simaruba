@@ -1,7 +1,6 @@
 ############################################################################
 ### PACKAGES AND DATA
 library(readxl)
-library(car)
 library(tidyverse)
 
 orig_all_data <- read_excel("data/data_raw.xlsx", sheet = "All_data_Categories")
