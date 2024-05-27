@@ -61,7 +61,7 @@ data_plots %>%
 ### Model
 
 # Fit full model
-mod.1a = lm(ba_total ~ harvested + vegetation_type + milpa +
+mod.1a <- lm(ba_total ~ harvested + vegetation_type + milpa +
               harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance and normality assumptions
@@ -71,7 +71,7 @@ plot(mod.1a, which = 1); plot(mod.1a, which = 2)
 MASS::boxcox(mod.1a)
 
 # Box-Cox suggests log transformation; re-fit model with log response
-mod.1a.transform = lm(log(ba_total) ~ harvested + vegetation_type + milpa +
+mod.1a.transform <- lm(log(ba_total) ~ harvested + vegetation_type + milpa +
                         harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance and normality assumptions

@@ -4,16 +4,16 @@ library(car)
 library(tidyverse)
 
 data_stems <- read_csv("data/data_stems.csv") %>%
-  mutate(plot_id = as.factor(plot_id),
-         size_class = as.factor(size_class),
-         harvested = as.factor(harvested),
-         vegetation_type = as.factor(vegetation_type),
-         milpa = as.factor(milpa))
+                mutate(plot_id = as.factor(plot_id),
+                       size_class = as.factor(size_class),
+                       harvested = as.factor(harvested),
+                       vegetation_type = as.factor(vegetation_type),
+                       milpa = as.factor(milpa))
 data_plots <- read_csv("data/data_plots.csv") %>%
-  mutate(plot_id = as.factor(plot_id),
-         harvested = as.factor(harvested),
-         vegetation_type = as.factor(vegetation_type),
-         milpa = as.factor(milpa))
+                mutate(plot_id = as.factor(plot_id),
+                       harvested = as.factor(harvested),
+                       vegetation_type = as.factor(vegetation_type),
+                       milpa = as.factor(milpa))
 ############################################################################
 
 ############################################################################
@@ -61,7 +61,7 @@ data_plots %>%
 ### Model
 
 # Fit full model
-mod.1b = lm(stemden_totaltrees ~ harvested + vegetation_type + milpa +
+mod.1b <- lm(stemden_totaltrees ~ harvested + vegetation_type + milpa +
               harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance and normality assumptions
@@ -71,7 +71,7 @@ plot(mod.1b, which = 1); plot(mod.1b, which = 2)
 MASS::boxcox(mod.1b)
 
 # Box-Cox suggests log transformation; re-fit model with logged response
-mod.1b.transform = lm(log(stemden_totaltrees) ~ harvested + vegetation_type + milpa +
+mod.1b.transform <- lm(log(stemden_totaltrees) ~ harvested + vegetation_type + milpa +
                         harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance and normality assumptions again
