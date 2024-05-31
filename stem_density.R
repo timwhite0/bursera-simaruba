@@ -14,6 +14,23 @@ data_plots <- read_csv("data/data_plots.csv") %>%
                        harvested = as.factor(harvested),
                        vegetation_type = as.factor(vegetation_type),
                        milpa = as.factor(milpa))
+
+plot_theme <- theme(plot.background = element_rect(fill = "white"),
+                    plot.title = element_blank(), 
+                    plot.subtitle = element_text(family="sans", face="plain"), 
+                    axis.title.x = element_text(family="sans", face="bold"),
+                    axis.title.y = element_text(family="sans", face="bold"),
+                    axis.text.x = element_text(family="sans", face="plain"),
+                    axis.text.y = element_text(family="sans", face="plain"),
+                    panel.background = element_rect(fill="white"),
+                    panel.grid.major.x = element_blank(),
+                    panel.grid.major.y = element_line(color="gainsboro"),
+                    panel.grid.minor = element_blank(),
+                    axis.ticks = element_blank(),
+                    legend.background = element_rect(color="black", fill = "white"),
+                    legend.position = c(0.9, 0.85),
+                    legend.title = element_text(color = "black", face = "bold", hjust = 0.5),
+                    legend.text = element_text(color = "black"))
 ############################################################################
 
 ############################################################################
@@ -35,26 +52,47 @@ data_plots %>%
 
 # Five-number summary of # total trees per ha for all plots, harvested plots, unharvested plots
 summary(data_plots$stemden_totaltrees)
-summary(data_plots[data_plots$harvested == "yes",]$stemden_totaltrees)
-summary(data_plots[data_plots$harvested == "no",]$stemden_totaltrees)
+data_plots %>% filter(harvested == "yes") %>% pull(stemden_totaltrees) %>% summary()
+data_plots %>% filter(harvested == "no") %>% pull(stemden_totaltrees) %>% summary()
 
-# Box plot of # total trees per ha by harvested
+# Box plot of log(# total trees per ha) by harvested
 data_plots %>%
+  mutate(harvested = fct_recode(harvested,
+                                "Harvested" = "yes", "Unharvested" = "no")) %>%
   ggplot() +
-  geom_boxplot(aes(x = harvested, y = stemden_totaltrees), fill = "gray90") +
-  theme_classic()
+  geom_boxplot(aes(x = fct_relevel(harvested, "Harvested", "Unharvested"),
+                   y = log(stemden_totaltrees)),
+               fill = "mistyrose2", outlier.shape = 21,
+               outlier.color = "gray20", outlier.fill = "gray80") +
+  plot_theme +
+  coord_cartesian(ylim = c(5, 8)) +
+  labs(x = "Plot status", y = "Total trees per hectare (log scale)")
 
-# Box plot of # total trees per ha by vegetation type
+# Box plot of log(# total trees per ha) by vegetation type
 data_plots %>%
+  mutate(vegetation_type = fct_recode(vegetation_type,
+                                      "Ju'uche'" = "juuche",
+                                      "Keelenche'" = "keelenche",
+                                      "Nuku'uch che'" = "nukuuchche")) %>%
   ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = stemden_totaltrees), fill = "gray90") +
-  theme_classic()
+  geom_boxplot(aes(x = vegetation_type, y = log(stemden_totaltrees)),
+               fill = "mistyrose2", outlier.shape = 21,
+               outlier.color = "gray20", outlier.fill = "gray80") +
+  plot_theme +
+  coord_cartesian(ylim = c(5, 8)) +
+  labs(x = "Vegetation type", y = "Total trees per hectare (log scale)")
 
-# Box plot of # total trees per ha by milpa
+# Box plot of log(# total trees per ha) by milpa
 data_plots %>%
+  mutate(milpa = fct_recode(milpa,
+                            "Yes" = "yes", "No" = "no")) %>%
   ggplot() +
-  geom_boxplot(aes(x = milpa, y = stemden_totaltrees), fill = "gray90") +
-  theme_classic()
+  geom_boxplot(aes(x = fct_relevel(milpa, "Yes", "No"), y = log(stemden_totaltrees)),
+               fill = "mistyrose2", outlier.shape = 21,
+               outlier.color = "gray20", outlier.fill = "gray80") +
+  plot_theme +
+  coord_cartesian(ylim = c(5, 8)) +
+  labs(x = "Milpa exposure", y = "Total trees per hectare (log scale)")
 
 # Interaction plots
 with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_totaltrees)

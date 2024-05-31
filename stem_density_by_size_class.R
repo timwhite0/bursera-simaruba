@@ -108,7 +108,7 @@ stemden_mean_data_noseedlings %>%
     ylim(0, 800) +
     scale_color_brewer(palette = "Dark2") +
     labs(x = "Size class", y = "Average number of stems per hectare") +
-    guides(col=guide_legend(title = "Status"))
+    guides(col=guide_legend(title = "Plot status"))
 
 # Point/line plot (seedlings only)
 stemden_mean_data_seedlings %>%
@@ -121,7 +121,7 @@ stemden_mean_data_seedlings %>%
   ylim(0, 10000) +
   scale_color_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average number of stems per hectare") +
-  guides(col=guide_legend(title = "Status"))
+  guides(col=guide_legend(title = "Plot status"))
 
 # Bar plot (all size classes except seedlings)
 stemden_mean_data_noseedlings %>%
@@ -136,7 +136,7 @@ stemden_mean_data_noseedlings %>%
     ylim(0, 800) +
     scale_fill_brewer(palette = "Dark2") +
     labs(x = "Size class", y = "Average number of stems per hectare") +
-    guides(fill=guide_legend(title = "Status"))
+    guides(fill=guide_legend(title = "Plot status"))
 
 # Bar plot (seedlings only)
 stemden_mean_data_seedlings %>%
@@ -151,7 +151,7 @@ stemden_mean_data_seedlings %>%
   ylim(0, 10000) +
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average number of stems per hectare") +
-  guides(fill=guide_legend(title = "Status"))
+  guides(fill=guide_legend(title = "Plot status"))
 
 
 
@@ -194,7 +194,7 @@ stemden_dist_data_noseedlings %>%
     scale_fill_brewer(palette = "Dark2") +
     coord_cartesian(ylim = c(0, 1500)) + # 2 outliers not shown
     labs(x = "Size class", y = "Number of stems per hectare") +
-    guides(fill = guide_legend(title = "Status"))
+    guides(fill = guide_legend(title = "Plot status"))
 
 # Violin plot (seedlings only)
 stemden_dist_data_seedlings %>%
@@ -206,7 +206,7 @@ stemden_dist_data_seedlings %>%
     plot_theme +
     scale_fill_brewer(palette = "Dark2") +
     labs(x = "Size class", y = "Number of stems per hectare") +
-    guides(fill=guide_legend(title = "Status"))
+    guides(fill=guide_legend(title = "Plot status"))
 
 # Box plot (all size classes except seedlings)
 stemden_dist_data_noseedlings %>%
@@ -219,7 +219,7 @@ stemden_dist_data_noseedlings %>%
     scale_fill_brewer(palette = "Dark2") +
     coord_cartesian(ylim = c(0, 1500)) + # 2 outliers not shown
     labs(x = "Size class", y = "Number of stems per hectare") +
-    guides(fill = guide_legend(title = "Status"))
+    guides(fill = guide_legend(title = "Plot status"))
 
 # Box plot (seedlings only)
 stemden_dist_data_seedlings %>%
@@ -231,7 +231,7 @@ stemden_dist_data_seedlings %>%
   plot_theme +
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Number of stems per hectare") +
-  guides(fill = guide_legend(title = "Status"))
+  guides(fill = guide_legend(title = "Plot status"))
 ############################################################################
 
 ############################################################################

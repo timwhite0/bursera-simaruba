@@ -89,7 +89,7 @@ ba_mean_data <- data_plots %>%
 # Point/line plot (all size classes except seedlings)
 ba_mean_data %>%
   ggplot() +
-  geom_pointrange(aes(x = size_class, col = fct_relevel(harvested, "harvested", "Unharvested"),
+  geom_pointrange(aes(x = size_class, col = fct_relevel(harvested, "Harvested", "Unharvested"),
                       ymin = lower, y = mean, ymax = upper),
                   position = position_dodge(width = 0.5), size = 0.5, linewidth = 1) +
   plot_theme +
@@ -100,7 +100,7 @@ ba_mean_data %>%
 # Bar plot (all size classes except seedlings)
 ba_mean_data %>%
   ggplot(aes(x = size_class,
-             fill = fct_relevel(harvested, "harvested", "Unharvested"))) +
+             fill = fct_relevel(harvested, "Harvested", "Unharvested"))) +
   geom_col(aes(y = mean),
            position = "dodge") +
   geom_errorbar(aes(x = size_class, ymin = lower, ymax = upper), col = "gray20",
@@ -136,7 +136,7 @@ ba_dist_data <- data_plots %>%
 ba_dist_data %>%
   ggplot() +
   geom_violin(aes(x = size_class, y = ba,
-                  fill = fct_relevel(harvested, "harvested", "Unharvested")),
+                  fill = fct_relevel(harvested, "Harvested", "Unharvested")),
               scale = "area", width = 2, position = position_dodge(width = 0.7),
               lwd = 0.75, kernel = "gaussian", adjust = 1.25) +
   plot_theme +
@@ -148,7 +148,7 @@ ba_dist_data %>%
 ba_dist_data %>%
   ggplot() +
   geom_boxplot(aes(x = size_class, y = ba,
-                   fill = fct_relevel(harvested, "harvested", "Unharvested")),
+                   fill = fct_relevel(harvested, "Harvested", "Unharvested")),
                outlier.shape = 21, outlier.color = "gray20",
                outlier.fill = "gray80") +
   plot_theme +
