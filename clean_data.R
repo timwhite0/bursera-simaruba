@@ -86,13 +86,13 @@ ba_by_size_class <- data_stems %>%
                       summarize(ba = sum(ba_per_stem), .groups = "drop") %>%
                       pivot_wider(names_from = size_class,
                                   values_from = ba, values_fill = 0) %>%
-                      mutate(ba_seedling = 0) %>%
-                      select(plot_id, ba_seedling,
-                             ba_sapling = sapling,
-                             ba_tree_05to09 = tree_05to09,
-                             ba_tree_10to14 = tree_10to14,
-                             ba_tree_15to19 = tree_15to19,
-                             ba_tree_20plus = tree_20plus)
+                      mutate(ba_seedlings = 0) %>%
+                      select(plot_id, ba_seedlings,
+                             ba_saplings = sapling,
+                             ba_trees05to09 = tree_05to09,
+                             ba_trees10to14 = tree_10to14,
+                             ba_trees15to19 = tree_15to19,
+                             ba_trees20plus = tree_20plus)
 
 stemden_by_size_class <- data_stems %>%
                           count(plot_id, size_class) %>%
@@ -116,7 +116,7 @@ data_plots <- data_plots %>%
                 left_join(ba_by_size_class, by = "plot_id") %>%
                 left_join(stemden_by_size_class, by = "plot_id") %>%
                 # Total BA for each plot should not include sapling BA
-                mutate(ba_total = ba_total - ba_sapling) %>%
+                mutate(ba_total = ba_total - ba_saplings) %>%
                 select(plot_id, harvested, vegetation_type, milpa,
                        starts_with("ba"), starts_with("stemden"))
 
@@ -129,10 +129,10 @@ rbind(table(data_stems$milpa, data_stems$plot_id),
 # classes except seedlings and saplings
 # FALSE if no issues; TRUE if there is at least one issue
 any(abs(round(data_plots$ba_total -
-                data_plots$ba_tree_05to09 -
-                data_plots$ba_tree_10to14 - 
-                data_plots$ba_tree_15to19 -
-                data_plots$ba_tree_20plus, 3)) > 0)
+                data_plots$ba_trees05to09 -
+                data_plots$ba_trees10to14 - 
+                data_plots$ba_trees15to19 -
+                data_plots$ba_trees20plus, 3)) > 0)
 
 # Check to make sure that for each plot, # total stems = sum of # of stems
 # of all size classes except seedlings and saplings
