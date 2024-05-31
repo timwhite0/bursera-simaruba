@@ -56,6 +56,11 @@ data_plots %>%
   geom_boxplot(aes(x = milpa, y = stemden_totaltrees), fill = "gray90") +
   theme_classic()
 
+# Interaction plots
+with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_totaltrees)
+                  interaction.plot(milpa, harvested, stemden_totaltrees)
+                  interaction.plot(vegetation_type, harvested, stemden_totaltrees)})
+
 
 
 ### Model
