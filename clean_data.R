@@ -60,7 +60,7 @@ data_plots <- orig_plots_data %>%
                 # Note: Artesanos is removed since we are not using it at all,
                 #       and SoilType is removed per Florencia's request
                 select(plot_id = `Plot #ID`,
-                       ba_total = `Basal Area (m2/ha-1)`,
+                       ba_totaltrees = `Basal Area (m2/ha-1)`,
                        harvested = Harvested,
                        vegetation_type = VegetationType,
                        milpa = `Milpa(has it been milpa)`) %>%
@@ -116,7 +116,7 @@ data_plots <- data_plots %>%
                 left_join(ba_by_size_class, by = "plot_id") %>%
                 left_join(stemden_by_size_class, by = "plot_id") %>%
                 # Total BA for each plot should not include sapling BA
-                mutate(ba_total = ba_total - ba_saplings) %>%
+                mutate(ba_totaltrees = ba_totaltrees - ba_saplings) %>%
                 select(plot_id, harvested, vegetation_type, milpa,
                        starts_with("ba"), starts_with("stemden"))
 
@@ -128,7 +128,7 @@ rbind(table(data_stems$milpa, data_stems$plot_id),
 # Check to make sure that for each plot, total BA = sum of BA of all size
 # classes except seedlings and saplings
 # FALSE if no issues; TRUE if there is at least one issue
-any(abs(round(data_plots$ba_total -
+any(abs(round(data_plots$ba_totaltrees -
                 data_plots$ba_trees05to09 -
                 data_plots$ba_trees10to14 - 
                 data_plots$ba_trees15to19 -
