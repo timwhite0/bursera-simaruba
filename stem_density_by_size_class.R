@@ -28,8 +28,8 @@ plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     panel.grid.minor = element_blank(),
                     axis.ticks = element_blank(),
                     legend.background = element_rect(color="black", fill = "white"),
-                    legend.position.inside = c(0.1, 0.8),
-                    legend.title = element_text(color = "black", face = "bold"),
+                    legend.position = c(0.9, 0.85),
+                    legend.title = element_text(color = "black", face = "bold", hjust = 0.5),
                     legend.text = element_text(color = "black"))
 ############################################################################
 
@@ -158,7 +158,6 @@ stemden_mean_data_seedlings %>%
 ### Distribution of stem densities by size class
 
 # Box plot (all size classes except seedlings)
-
 stemden_dist_data <- data_plots %>%
                       select(harvested, stemden_seedlings,
                              stemden_saplings, starts_with("stemden_trees")) %>%
@@ -189,12 +188,11 @@ stemden_dist_data_noseedlings %>%
   ggplot() +
     geom_violin(aes(x = size_class, y = num_stems,
                     fill = fct_relevel(harvested, "Harvested", "Unharvested")),
-                scale = "area", width = 1.5, position = position_dodge(width = 0.7),
+                scale = "area", width = 2, position = position_dodge(width = 0.7),
                 lwd = 0.75, kernel = "gaussian", adjust = 1.25) +
-    plot_theme + theme(legend.position.inside = c(0.85, 0.85),
-                       legend.title = element_text(hjust = 0.5)) +
+    plot_theme +
     scale_fill_brewer(palette = "Dark2") +
-    ylim(c(0, 1500)) + # 2 outliers not shown
+    coord_cartesian(ylim = c(0, 1500)) + # 2 outliers not shown
     labs(x = "Size class", y = "Number of stems per hectare") +
     guides(fill = guide_legend(title = "Status"))
 
@@ -205,8 +203,7 @@ stemden_dist_data_seedlings %>%
                     fill = fct_relevel(harvested, "Harvested", "Unharvested")),
                 scale = "area", width = 0.5, position = position_dodge(width = 0.7),
                 lwd = 0.75, kernel = "gaussian", adjust = 1.25) +
-    plot_theme + theme(legend.position.inside = c(0.85, 0.85),
-                       legend.title = element_text(hjust = 0.5)) +
+    plot_theme +
     scale_fill_brewer(palette = "Dark2") +
     labs(x = "Size class", y = "Number of stems per hectare") +
     guides(fill=guide_legend(title = "Status"))
@@ -218,10 +215,9 @@ stemden_dist_data_noseedlings %>%
                      fill = fct_relevel(harvested, "Harvested", "Unharvested")),
                  outlier.shape = 21, outlier.color = "gray20",
                  outlier.fill = "gray80") +
-    plot_theme + theme(legend.position.inside = c(0.85, 0.85),
-                       legend.title = element_text(hjust = 0.5)) +
+    plot_theme +
     scale_fill_brewer(palette = "Dark2") +
-    ylim(c(0, 1500)) + # 2 outliers not shown
+    coord_cartesian(ylim = c(0, 1500)) + # 2 outliers not shown
     labs(x = "Size class", y = "Number of stems per hectare") +
     guides(fill = guide_legend(title = "Status"))
 
@@ -232,8 +228,7 @@ stemden_dist_data_seedlings %>%
                    fill = fct_relevel(harvested, "Harvested", "Unharvested")),
                outlier.shape = 21, outlier.color = "gray20",
                outlier.fill = "gray80") +
-  plot_theme + theme(legend.position.inside = c(0.85, 0.85),
-                     legend.title = element_text(hjust = 0.5)) +
+  plot_theme +
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Number of stems per hectare") +
   guides(fill = guide_legend(title = "Status"))
@@ -262,25 +257,6 @@ data_plots %>%
   ggplot() + geom_histogram(aes(x = stemden_trees20plus), bins = 5,
                             col = "black", fill = "gray80") + plot_theme
 
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_seedlings, fill = harvested), bins = 20,
-                            col = "black") + facet_wrap(~harvested) + plot_theme
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_saplings, fill = harvested), bins = 20,
-                            col = "black") + facet_wrap(~harvested) + plot_theme
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_trees05to09, fill = harvested), bins = 20,
-                            col = "black") + facet_wrap(~harvested) + plot_theme
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_trees10to14, fill = harvested), bins = 20,
-                            col = "black") + facet_wrap(~harvested) + plot_theme
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_trees15to19, fill = harvested), bins = 10,
-                            col = "black") + facet_wrap(~harvested) + plot_theme
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_trees20plus, fill = harvested), bins = 5,
-                            col = "black") + facet_wrap(~harvested) + plot_theme
-
 # Five-number summary of # stems per ha by size class for all plots, harvested plots, unharvested plots
 summary(data_plots$stemden_seedlings)
 data_plots %>% filter(harvested == "yes") %>% pull(stemden_seedlings) %>% summary()
@@ -305,6 +281,26 @@ data_plots %>% filter(harvested == "no") %>% pull(stemden_trees15to19) %>% summa
 summary(data_plots$stemden_trees20plus)
 data_plots %>% filter(harvested == "yes") %>% pull(stemden_trees20plus) %>% summary()
 data_plots %>% filter(harvested == "no") %>% pull(stemden_trees20plus) %>% summary()
+
+# Box plot of # stems per ha by harvested for each size class
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = harvested, y = stemden_seedlings,
+                   fill = harvested)) + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = harvested, y = stemden_saplings,
+                   fill = harvested)) + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = harvested, y = stemden_trees05to09,
+                   fill = harvested)) + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = harvested, y = stemden_trees10to14,
+                   fill = harvested)) + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = harvested, y = stemden_trees15to19,
+                   fill = harvested)) + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = harvested, y = stemden_trees20plus,
+                   fill = harvested)) + plot_theme
 
 # Box plot of # stems per ha by vegetation type for each size class
 data_plots %>% ggplot() +
@@ -587,7 +583,7 @@ Anova(mod.2b.20plus, type = 2)
 TukeyHSD(aov(mod.2b.20plus), "vegetation_type", conf.level = 0.95)
 # Nuku'uch che' has significantly HIGHER 20+ cm tree density than ju'uche' and keelenche';
 # no significant difference between the latter two
-# This is different from previous significant VegetationType results; for total stems (1B)
+# This is different from previous significant vegetation_type results; for total stems (1B)
 # and seedlings (2B), nuku'uch'che' had a significantly lower stem density than the other levels
 
 # Pairwise comparison for milpa using Tukey HSD

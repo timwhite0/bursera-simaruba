@@ -18,8 +18,8 @@ plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     panel.grid.minor = element_blank(),
                     axis.ticks = element_blank(),
                     legend.background = element_rect(color="black", fill = "white"),
-                    legend.position = c(0.1, 0.8),
-                    legend.title = element_text(color = "black", face = "bold"),
+                    legend.position = c(0.9, 0.85),
+                    legend.title = element_text(color = "black", face = "bold", hjust = 0.5),
                     legend.text = element_text(color = "black"))
 ############################################################################
 
@@ -57,7 +57,6 @@ prop_cortado %>%
   filter(harvested == "yes") %>%
   ggplot() +
     geom_histogram(aes(x = proportion_cortado), fill = "gray90", col = "black") +
-    lims(x = c(0, 0.3), y = c(0, 6)) +
     labs(x = "Proportion of trees that are cut") +
     theme_classic()
 
@@ -97,7 +96,7 @@ prop_cortado %>%
                  fill = fct_relevel(status, "Not cut", "Cut"))) +
   ylim(0, 60) +
   scale_fill_brewer(palette = "Paired") +
-  plot_theme +
+  plot_theme + theme(legend.position = c(0.1, 0.85)) +
   labs(title = "Cut and uncut individuals in harvested plots",
        x = "Plot ID", y = "Number of individuals") +
   geom_hline(yintercept = 0) +
