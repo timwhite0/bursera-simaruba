@@ -1,5 +1,20 @@
-############################################################################
-### PACKAGES AND DATA
+---
+title: "\\textbf{Stem density}"
+author: "\\textbf{Tim White}"
+date: "\\textbf{June 2024}"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
+                      fig.height=3, fig.width=5, fig.align='center')
+```
+
+
+
+# Packages and data
+
+```{r}
 library(car)
 library(tidyverse)
 
@@ -31,32 +46,45 @@ plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     legend.position = c(0.9, 0.85),
                     legend.title = element_text(color = "black", face = "bold", hjust = 0.5),
                     legend.text = element_text(color = "black"))
-############################################################################
+```
 
-############################################################################
-### 1B: STEM DENSITY (ALL SIZE CLASSES EXCEPT SEEDLINGS AND SAPLINGS)
 
-### Figures
 
-# Histogram of # total trees per ha for all plots, harvested plots, unharvested plots
+# Figures
+
+## Histograms of total trees per hectare
+
+```{r}
+# All plots
 data_plots %>%
   ggplot() +
   geom_histogram(aes(x = stemden_totaltrees), bins = 10, fill = "gray90", col = "black") +
-  theme_classic() + ylim(c(0,20))
+  theme_classic() + ylim(c(0,20)) + labs(x = "Total trees per hectare", y = "Frequency")
 
+# Harvested vs. unharvested plots
 data_plots %>%
   ggplot() +
   geom_histogram(aes(x = stemden_totaltrees), bins = 10, fill = "gray90", col = "black") +
   facet_wrap(~harvested) +
-  theme_classic() + ylim(c(0,20))
+  theme_classic() + ylim(c(0,20)) + labs(x = "Total trees per hectare", y = "Frequency")
+```
 
-# Five-number summary of # total trees per ha for all plots, harvested plots, unharvested plots
+## Five-number summaries of total trees per hectare
+
+```{r}
+# All plots
 summary(data_plots$stemden_totaltrees)
+
+# Harvested vs. unharvested plots
 data_plots %>% filter(harvested == "yes") %>% pull(stemden_totaltrees) %>% summary()
 data_plots %>% filter(harvested == "no") %>% pull(stemden_totaltrees) %>% summary()
+```
 
-# Box plot of log(# total trees per ha) by harvested
-data_plots %>%
+## Box plots of total trees per hectare (log scale)
+
+```{r}
+# By harvesting status
+stemden_fig1 <- data_plots %>%
   mutate(harvested = fct_recode(harvested,
                                 "Harvested" = "yes", "Unharvested" = "no")) %>%
   ggplot() +
@@ -67,9 +95,11 @@ data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(5, 8)) +
   labs(x = "Plot status", y = "Total trees per hectare (log scale)")
+ggsave("figures/stemden_fig1.png", height = 4, width = 6)
+stemden_fig1
 
-# Box plot of log(# total trees per ha) by vegetation type
-data_plots %>%
+# By vegetation type
+stemden_fig2 <- data_plots %>%
   mutate(vegetation_type = fct_recode(vegetation_type,
                                       "Ju'uche'" = "juuche",
                                       "Keelenche'" = "keelenche",
@@ -81,9 +111,11 @@ data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(5, 8)) +
   labs(x = "Vegetation type", y = "Total trees per hectare (log scale)")
+ggsave("figures/stemden_fig2.png", height = 4, width = 6)
+stemden_fig2
 
-# Box plot of log(# total trees per ha) by milpa
-data_plots %>%
+# By milpa exposure
+stemden_fig3 <- data_plots %>%
   mutate(milpa = fct_recode(milpa,
                             "Yes" = "yes", "No" = "no")) %>%
   ggplot() +
@@ -93,55 +125,73 @@ data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(5, 8)) +
   labs(x = "Milpa exposure", y = "Total trees per hectare (log scale)")
+ggsave("figures/stemden_fig3.png", height = 4, width = 6)
+stemden_fig3
+```
 
-# Interaction plots
+## Interaction plots
+
+```{r}
+par(mfrow = c(1,3))
 with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_totaltrees)
                   interaction.plot(milpa, harvested, stemden_totaltrees)
                   interaction.plot(vegetation_type, harvested, stemden_totaltrees)})
+```
 
 
 
-### Model
+# Models
 
-# Fit full model
-mod.1b <- lm(stemden_totaltrees ~ harvested + vegetation_type + milpa +
+## Fit model and check assumptions
+
+```{r}
+mod <- lm(stemden_totaltrees ~ harvested + vegetation_type + milpa +
               harvested:vegetation_type + harvested:milpa, data = data_plots)
 
-# Check constant variance and normality assumptions
-plot(mod.1b, which = 1); plot(mod.1b, which = 2)
+par(mfrow = c(1,2))
+plot(mod, which = 1:2)
+```
 
+## Attempt transformation of response
+
+```{r}
 # There is a megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod.1b)
+MASS::boxcox(mod)
 
 # Box-Cox suggests log transformation; re-fit model with logged response
-mod.1b.transform <- lm(log(stemden_totaltrees) ~ harvested + vegetation_type + milpa +
+mod.transform <- lm(log(stemden_totaltrees) ~ harvested + vegetation_type + milpa +
                         harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance and normality assumptions again
-plot(mod.1b.transform, which = 1); plot(mod.1b.transform, which = 2)
+par(mfrow = c(1,2))
+plot(mod.transform, which = 1:2)
+```
 
-# The assumptions appear to be satisfied now, so we will proceed with the transformed model
+The assumptions appear to be satisfied now, so we will proceed with the transformed model. Note that we could also fix the assumption violations by removing a significant outlier (plot 19) from the untransformed model. However, we decide to use the log-transform since our sample size is already quite small; if we removed the outlier, it would get even smaller.
 
-# Note that we could also fix the assumption violations by removing a significant outlier (plot 19) from the untransformed model
-# However, we decide to use the log-transform since our sample size is already quite small; if we removed the outlier, it would get even smaller
+## Summarize selected model and run ANOVA
 
+```{r}
 # Check for outliers
-outlierTest(mod.1b.transform)
+outlierTest(mod.transform)
 
 # No significant outliers; look at model summary
-summary(mod.1b.transform)
-# Adjusted R^2 is higher than in section 1A, but still not great
+summary(mod.transform)
 
 # Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.1b.transform, type = 2)
+Anova(mod.transform, type = 2)
+```
 
-# We find that vegetation type is significant, but harvested, milpa, and the interaction terms are not
+We find that vegetation type is significant, but harvested, milpa, and the interaction terms are not.
 
-# Pairwise comparison for vegetation type using Tukey HSD
-TukeyHSD(aov(mod.1b.transform), "vegetation_type", conf.level = 0.95)
+## Pairwise comparisons
+
+```{r}
+# Tukey HSD for vegetation type
 # Keelenche' has a significantly higher stem density then Nuku'uch che'
+TukeyHSD(aov(mod.transform), "vegetation_type", conf.level = 0.95)
 
 # Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.1b.transform), "harvested", conf.level = 0.95)
 # Unharvested plots have higher stem density than harvested plots, but difference is not significant
-############################################################################
+TukeyHSD(aov(mod.transform), "harvested", conf.level = 0.95)
+```

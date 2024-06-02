@@ -1,5 +1,20 @@
-############################################################################
-### PACKAGES AND DATA
+---
+title: "\\textbf{Basal area by size class}"
+author: "\\textbf{Tim White}"
+date: "\\textbf{June 2024}"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
+                      fig.height=4, fig.width=8, fig.align='center')
+```
+
+
+
+# Packages, data, and functions
+
+```{r}
 library(car)
 library(tidyverse)
 
@@ -14,6 +29,17 @@ data_plots <- read_csv("data/data_plots.csv") %>%
                        harvested = as.factor(harvested),
                        vegetation_type = as.factor(vegetation_type),
                        milpa = as.factor(milpa))
+
+compute_bootstrap_interval <- function(var, statistic = mean, num_iters = 50000, 
+                                       percentiles = c(0.025, 0.975)) {
+  boot_samples <- numeric(num_iters)
+  
+  for (i in 1:num_iters) {
+    boot_samples[i] <- statistic(sample(var, size = length(var), replace = TRUE))
+  }
+  
+  return(quantile(boot_samples, percentiles))
+}
 
 plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     plot.title = element_blank(), 
@@ -31,24 +57,17 @@ plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     legend.position = c(0.9, 0.85),
                     legend.title = element_text(color = "black", face = "bold", hjust = 0.5),
                     legend.text = element_text(color = "black"))
-############################################################################
+```
 
-############################################################################
-### 2C: BASAL AREA BY SIZE CLASS (FIGURES)
 
-### Average basal area by size class
 
-compute_bootstrap_interval <- function(var, statistic = mean, num_iters = 50000, 
-                                       percentiles = c(0.025, 0.975)) {
-  boot_samples <- numeric(num_iters)
-  
-  for (i in 1:num_iters) {
-    boot_samples[i] <- statistic(sample(var, size = length(var), replace = TRUE))
-  }
-  
-  return(quantile(boot_samples, percentiles))
-}
+# Figures
 
+## Average basal area by size class
+
+### Compute boostrap intervals and organize data
+
+```{r}
 harvested <- data_plots %>%
               filter(harvested == "yes") %>%
               select(ba_saplings, starts_with("ba_trees"))
@@ -85,9 +104,12 @@ ba_mean_data <- data_plots %>%
                                                  "Trees (10-14 cm DBH)" = "trees10to14",
                                                  "Trees (15-19 cm DBH)" = "trees15to19",
                                                  "Trees (20+ cm DBH)" = "trees20plus"))
+```
 
-# Point/line plot (all size classes except seedlings)
-ba_mean_data %>%
+### Pointrange plot
+
+```{r}
+ba_sizeclass_fig1 <- ba_mean_data %>%
   ggplot() +
   geom_pointrange(aes(x = size_class, col = fct_relevel(harvested, "Harvested", "Unharvested"),
                       ymin = lower, y = mean, ymax = upper),
@@ -96,9 +118,14 @@ ba_mean_data %>%
   scale_color_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average basal area (m2 per hectare)") +
   guides(col=guide_legend(title = "Status"))
+ggsave("figures/ba_sizeclass_fig1.png", height = 4, width = 8)
+ba_sizeclass_fig1
+```
 
-# Bar plot (all size classes except seedlings)
-ba_mean_data %>%
+### Bar plot
+
+```{r}
+ba_sizeclass_fig2 <- ba_mean_data %>%
   ggplot(aes(x = size_class,
              fill = fct_relevel(harvested, "Harvested", "Unharvested"))) +
   geom_col(aes(y = mean),
@@ -109,12 +136,15 @@ ba_mean_data %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average basal area (m2 per hectare)") +
   guides(fill=guide_legend(title = "Status"))
+ggsave("figures/ba_sizeclass_fig2.png", height = 4, width = 8)
+ba_sizeclass_fig2
+```
 
+## Distribution of basal area by size class
 
+### Organize data
 
-### Distribution of basal area by size class
-
-# Box plot (all size classes except seedlings)
+```{r}
 ba_dist_data <- data_plots %>%
                   select(harvested, ba_saplings, starts_with("ba_trees")) %>%
                   pivot_longer(cols = starts_with("ba"),
@@ -131,8 +161,11 @@ ba_dist_data <- data_plots %>%
                                                  "Trees (10-14 cm DBH)" = "trees10to14",
                                                  "Trees (15-19 cm DBH)" = "trees15to19",
                                                  "Trees (20+ cm DBH)" = "trees20plus"))
+```
 
-# Violin plot (all size classes except seedlings)
+### Violin plot
+
+```{r}
 ba_dist_data %>%
   ggplot() +
   geom_violin(aes(x = size_class, y = ba,
@@ -143,9 +176,12 @@ ba_dist_data %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Basal area (m2 per hectare)") +
   guides(fill = guide_legend(title = "Status"))
+```
 
-# Box plot (all size classes except seedlings)
-ba_dist_data %>%
+### Box plot
+
+```{r}
+ba_sizeclass_fig3 <- ba_dist_data %>%
   ggplot() +
   geom_boxplot(aes(x = size_class, y = ba,
                    fill = fct_relevel(harvested, "Harvested", "Unharvested")),
@@ -155,14 +191,15 @@ ba_dist_data %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Basal area (m2 per hectare)") +
   guides(fill = guide_legend(title = "Status"))
-############################################################################
+ggsave("figures/ba_sizeclass_fig3.png", height = 4, width = 8)
+ba_sizeclass_fig3
+```
 
-############################################################################
-### 2D: BASAL AREA BY SIZE CLASS (MODELS)
+## Basal area by size class for different covariates
 
-### Figures
+### Histograms, harvesting status
 
-# Histogram of BA (m2/ha) by size class for all plots, harvested plots, unharvested plots
+```{r}
 data_plots %>%
   ggplot() + geom_histogram(aes(x = ba_saplings), bins = 20,
                             col = "black", fill = "gray80") + plot_theme
@@ -178,8 +215,11 @@ data_plots %>%
 data_plots %>%
   ggplot() + geom_histogram(aes(x = ba_trees20plus), bins = 5,
                             col = "black", fill = "gray80") + plot_theme
+```
 
-# Five-number summary of BA (m2/ha) by size class for all plots, harvested plots, unharvested plots
+### Five-number summaries, harvesting status
+
+```{r}
 summary(data_plots$ba_saplings)
 data_plots %>% filter(harvested == "yes") %>% pull(ba_saplings) %>% summary()
 data_plots %>% filter(harvested == "no") %>% pull(ba_saplings) %>% summary()
@@ -199,59 +239,72 @@ data_plots %>% filter(harvested == "no") %>% pull(ba_trees15to19) %>% summary()
 summary(data_plots$ba_trees20plus)
 data_plots %>% filter(harvested == "yes") %>% pull(ba_trees20plus) %>% summary()
 data_plots %>% filter(harvested == "no") %>% pull(ba_trees20plus) %>% summary()
+```
 
-# Box plot of BA (m2/ha) by harvested for each size class
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = ba_saplings,
-                   fill = harvested)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = ba_trees05to09,
-                   fill = harvested)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = ba_trees10to14,
-                   fill = harvested)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = ba_trees15to19,
-                   fill = harvested)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = ba_trees20plus,
-                   fill = harvested)) + plot_theme
+### Box plots, harvesting status
 
-# Box plot of BA (m2/ha) by vegetation type for each size class
+```{r}
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = ba_saplings,
-                   fill = vegetation_type)) + plot_theme
+  geom_boxplot(aes(x = harvested, y = ba_saplings),
+               col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = ba_trees05to09,
-                   fill = vegetation_type)) + plot_theme
+  geom_boxplot(aes(x = harvested, y = ba_trees05to09),
+               col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = ba_trees10to14,
-                   fill = vegetation_type)) + plot_theme
+  geom_boxplot(aes(x = harvested, y = ba_trees10to14),
+               col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = ba_trees15to19,
-                   fill = vegetation_type)) + plot_theme
+  geom_boxplot(aes(x = harvested, y = ba_trees15to19),
+               col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = ba_trees20plus,
-                   fill = vegetation_type)) + plot_theme
+  geom_boxplot(aes(x = harvested, y = ba_trees20plus),
+               col = "black", fill = "gray80") + plot_theme
+```
 
-# Box plot of BA (m2/ha) by milpa for each size class
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = ba_saplings,
-                   fill = milpa)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = ba_trees05to09,
-                   fill = milpa)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = ba_trees10to14,
-                   fill = milpa)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = ba_trees15to19,
-                   fill = milpa)) + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = ba_trees20plus,
-                   fill = milpa)) + plot_theme
+### Box plots, vegetation type
 
-# Interaction plots for each size class
+```{r}
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = vegetation_type, y = ba_saplings),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = vegetation_type, y = ba_trees05to09),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = vegetation_type, y = ba_trees10to14),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = vegetation_type, y = ba_trees15to19),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = vegetation_type, y = ba_trees20plus),
+               col = "black", fill = "gray80") + plot_theme
+```
+
+### Box plots, milpa exposure
+
+```{r}
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = milpa, y = ba_saplings),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = milpa, y = ba_trees05to09),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = milpa, y = ba_trees10to14),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = milpa, y = ba_trees15to19),
+               col = "black", fill = "gray80") + plot_theme
+data_plots %>% ggplot() +
+  geom_boxplot(aes(x = milpa, y = ba_trees20plus),
+               col = "black", fill = "gray80") + plot_theme
+```
+
+### Interaction plots
+
+```{r}
+par(mfrow = c(1,3))
 with(data_plots, {interaction.plot(vegetation_type, milpa, ba_saplings)
                   interaction.plot(milpa, harvested, ba_saplings)
                   interaction.plot(vegetation_type, harvested, ba_saplings)})
@@ -267,191 +320,256 @@ with(data_plots, {interaction.plot(vegetation_type, milpa, ba_trees15to19)
 with(data_plots, {interaction.plot(vegetation_type, milpa, ba_trees20plus)
                   interaction.plot(milpa, harvested, ba_trees20plus)
                   interaction.plot(vegetation_type, harvested, ba_trees20plus)})
+```
 
 
 
-### Models
+# Models
 
-## Seedlings (seedling BA = 0 by definition, so there is no BA model for seedlings)
+## Seedlings
 
+Seedlings have zero basal area by definition, so there is no need to fit a model for seedlings.
 
+## Saplings (0-4 cm DBH)
 
-## Saplings
+### Fit model and check assumptions
 
-# Fit full model
-mod.2d.saplings <- lm(ba_saplings ~ harvested + vegetation_type + milpa +
+```{r}
+mod.saplings <- lm(ba_saplings ~ harvested + vegetation_type + milpa +
                         harvested:vegetation_type + harvested:vegetation_type, data = data_plots)
 
-# Check constant variance and normality assumptions
-plot(mod.2d.saplings, which = 1); plot(mod.2d.saplings, which = 2)
+par(mfrow = c(1,2))
+plot(mod.saplings, which = 1:2)
+```
 
+### Attempt transformation of response
+
+```{r}
 # Very distinct megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod.2d.saplings)
+MASS::boxcox(mod.saplings)
 
 # Box-Cox strongly suggests log transformation; re-fit model with logged response
-mod.2d.saplings.transform <- lm(log(ba_saplings) ~ harvested + vegetation_type + milpa +
+mod.saplings.transform <- lm(log(ba_saplings) ~ harvested + vegetation_type + milpa +
                                   harvested:vegetation_type + harvested:vegetation_type, data = data_plots)
 
 # Check constant variance assumption again
-plot(mod.2d.saplings.transform, which = 1); plot(mod.2d.saplings.transform, which = 2)
+par(mfrow = c(1,2))
+plot(mod.saplings.transform, which = 1:2)
+```
 
-# Assumptions look significantly better, so we will proceed with the transformed model
+Assumptions look significantly better, so we will proceed with the transformed model.
+
+### Summarize selected model and run ANOVA
+
+```{r}
 # Check for outliers
-outlierTest(mod.2d.saplings.transform)
+outlierTest(mod.saplings.transform)
 
 # No significant outliers; look at model summary
-summary(mod.2d.saplings.transform)
+summary(mod.saplings.transform)
 
 # Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2d.saplings.transform, type = 2)
+Anova(mod.saplings.transform, type = 2)
+```
 
-# We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not
 
+We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not.
+
+### Pairwise comparisons
+
+```{r}
 # Pairwise comparison for vegetation_type using Tukey HSD
-TukeyHSD(aov(mod.2d.saplings.transform), "vegetation_type", conv.level = 0.95)
 # Nuku'uch che' has a significantly lower sapling BA than Ju'uche' and Keelenche'
+TukeyHSD(aov(mod.saplings.transform), "vegetation_type", conv.level = 0.95)
 
 # Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2d.saplings.transform), "harvested", conv.level = 0.95)
+TukeyHSD(aov(mod.saplings.transform), "harvested", conv.level = 0.95)
+```
 
+## Trees (5-9 cm DBH)
 
+### Fit model and check assumptions
 
-## 5-9 cm trees
-
-# Fit full model
-mod.2d.05to09 <- lm(ba_trees05to09 ~ harvested + vegetation_type + milpa +
+```{r}
+mod.05to09 <- lm(ba_trees05to09 ~ harvested + vegetation_type + milpa +
                     harvested:vegetation_type + harvested:milpa, data = data_plots)
 
-# Check constant variance and normality assumptions
-plot(mod.2d.05to09, which = 1); plot(mod.2d.05to09, which = 2)
+par(mfrow = c(1,2))
+plot(mod.05to09, which = 1:2)
+```
 
+### Attempt transformation of response
+
+```{r}
 # Very distinct megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod.2d.05to09)
+MASS::boxcox(mod.05to09)
 
 # Box-Cox strongly suggests log transformation; re-fit model with logged response
-mod.2d.05to09.transform <- lm(log(ba_trees05to09) ~ harvested + vegetation_type + milpa +
+mod.05to09.transform <- lm(log(ba_trees05to09) ~ harvested + vegetation_type + milpa +
                                 harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance assumption again
-plot(mod.2d.05to09.transform, which = 1); plot(mod.2d.05to09.transform, which = 2)
+par(mfrow = c(1,2))
+plot(mod.05to09.transform, which = 1:2)
+```
 
-# Assumptions look significantly better, so we will proceed with the transformed model
+Assumptions look significantly better, so we will proceed with the transformed model.
+
+### Summarize selected model and run ANOVA
+```{r}
 # Check for outliers
-outlierTest(mod.2d.05to09.transform)
+outlierTest(mod.05to09.transform)
 
 # No significant outliers; look at model summary
-summary(mod.2d.05to09.transform)
+summary(mod.05to09.transform)
 
 # Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2d.05to09.transform, type = 2)
+Anova(mod.05to09.transform, type = 2)
+```
 
-# We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not
+We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not.
 
+### Pairwise comparisons
+
+```{r}
 # Pairwise comparison for vegetation_type using Tukey HSD
-TukeyHSD(aov(mod.2d.05to09.transform), "vegetation_type", conf.level = 0.95)
 # Keelenche' has a significantly higher 5-9 cm tree BA than Nuku'uch che'
+TukeyHSD(aov(mod.05to09.transform), "vegetation_type", conf.level = 0.95)
 
 # Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2d.05to09.transform), "harvested", conf.level = 0.95)
+TukeyHSD(aov(mod.05to09.transform), "harvested", conf.level = 0.95)
+```
 
+## Trees (10-14 cm DBH)
 
+### Fit model and check assumptions
 
-## 10-14 cm trees
-
-# Fit full model
-mod.2d.10to14 <- lm(ba_trees10to14 ~ harvested + vegetation_type + milpa +
+```{r}
+mod.10to14 <- lm(ba_trees10to14 ~ harvested + vegetation_type + milpa +
                       harvested:vegetation_type + harvested:milpa, data = data_plots)
 
-# Check constant variance and normality assumptions
-plot(mod.2d.10to14, which = 1); plot(mod.2d.10to14, which = 2)
+par(mfrow = c(1,2))
+plot(mod.10to14, which = 1:2)
+```
 
-# Assumptions appear to be satisfied
+Assumptions appear to be satisfied.
+
+### Summarize selected model and run ANOVA
+
+```{r}
 # Check for outliers
-outlierTest(mod.2d.10to14)
+outlierTest(mod.10to14)
 
 # No significant outliers; look at model summary
-summary(mod.2d.10to14)
+summary(mod.10to14)
 
 # Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2d.10to14, type = 2)
+Anova(mod.10to14, type = 2)
+```
 
-# We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not
+We find that vegetation type is significant, but harvested, milpa, and the interaction terms are not.
 
+### Pairwise comparisons
+
+```{r}
 # Pairwise comparison for vegetation_type using Tukey HSD
-TukeyHSD(aov(mod.2d.10to14), "vegetation_type", conf.level = 0.95)
 # Keelenche' has a significantly higher 10-14 cm tree BA than Nuku'uch che'
+TukeyHSD(aov(mod.10to14), "vegetation_type", conf.level = 0.95)
 
 # Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2d.10to14), "harvested", conf.level = 0.95)
+TukeyHSD(aov(mod.10to14), "harvested", conf.level = 0.95)
+```
 
+## Trees (15-19 cm DBH)
 
+### Fit model and check assumptions
 
-## 15-19 cm trees
-
-# Fit full model
-mod.2d.15to19 <- lm(ba_trees15to19 ~ harvested + vegetation_type + milpa +
+```{r}
+mod.15to19 <- lm(ba_trees15to19 ~ harvested + vegetation_type + milpa +
                       harvested:vegetation_type + harvested:milpa, data = data_plots)
 
-# Check constant variance and normality assumptions
-plot(mod.2d.15to19, which = 1); plot(mod.2d.15to19, which = 2)
+par(mfrow = c(1,2))
+plot(mod.15to19, which = 1:2)
+```
 
-# Assumptions appear to be satisfied
+Assumptions appear to be satisfied.
+
+### Summarize selected model and run ANOVA
+
+```{r}
 # Check for outliers
-outlierTest(mod.2d.15to19)
+outlierTest(mod.15to19)
 
 # No significant outliers; look at model summary
-summary(mod.2d.15to19)
-# R^2 is low
+summary(mod.15to19)
 
 # Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2d.15to19, type = 2)
+Anova(mod.15to19, type = 2)
+```
 
-# We find that no predictors are significant
+We find that no predictors are significant.
 
+### Pairwise comparisons
+
+```{r}
 # Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2d.15to19), "harvested", conf.level = 0.95)
+TukeyHSD(aov(mod.15to19), "harvested", conf.level = 0.95)
+```
 
+## Trees (20+ cm DBH)
 
+### Fit model and check assumptions
 
-## 20+ cm trees
-
-# Fit full model
-mod.2d.20plus <- lm(ba_trees20plus ~ harvested + vegetation_type + milpa +
+```{r}
+mod.20plus <- lm(ba_trees20plus ~ harvested + vegetation_type + milpa +
                       harvested:vegetation_type + harvested:milpa, data = data_plots)
 
-# Check constant variance and normality assumptions
-plot(mod.2d.20plus, which = 1); plot(mod.2d.20plus, which = 2)
+par(mfrow = c(1,2))
+plot(mod.20plus, which = 1:2)
+```
 
-# There is a slight megaphone shape on the residuals vs. fitted. We can't do a log transformation since the response has zeros.
-# Try square root transformation
-mod.2d.20plus.transform <- lm(sqrt(ba_trees20plus) ~ harvested + vegetation_type + milpa +
+There is a slight megaphone shape on the residuals vs. fitted. We can't do a log transformation since the response has zeros, so we'll try a square root transformation.
+
+### Attempt transformation of response
+
+```{r}
+mod.20plus.transform <- lm(sqrt(ba_trees20plus) ~ harvested + vegetation_type + milpa +
                                 harvested:vegetation_type + harvested:milpa, data = data_plots)
 
 # Check constant variance assumption again
-plot(mod.2d.20plus.transform, which = 1); plot(mod.2d.20plus.transform, which = 2)
+par(mfrow = c(1,2))
+plot(mod.20plus.transform, which = 1:2)
+```
 
-# No substantial improvement in assumptions, so we will proceed with the untransformed model
+No substantial improvement in assumptions, so we will proceed with the untransformed model.
+
+### Summarize selected model and run ANOVA
+
+```{r}
 # Check for outliers
-outlierTest(mod.2d.20plus)
+outlierTest(mod.20plus)
 
 # No significant outliers; look at model summary
-summary(mod.2d.20plus)
-# R^2 is relatively low
+summary(mod.20plus)
 
 # Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2d.20plus, type = 2)
+Anova(mod.20plus, type = 2)
+```
 
-# We find that vegetation_type and milpa are significant, but harvested and the interaction terms are not
+We find that vegetation type and milpa are significant, but harvested and the interaction terms are not.
 
+### Pairwise comparisons
+
+```{r}
 # Pairwise comparison for vegetation_type using Tukey HSD
-TukeyHSD(aov(mod.2d.20plus), "vegetation_type", conf.level = 0.95)
 # Nuku'uch che' has significantly higher 20+ cm tree BA than ju'uche' and keelenche';
 # no significant difference between the latter two
+TukeyHSD(aov(mod.20plus), "vegetation_type", conf.level = 0.95)
 
 # Pairwise comparison for milpa using Tukey HSD
-TukeyHSD(aov(mod.2d.20plus), "milpa", conf.level = 0.95)
 # Plots that have been milpa have significantly higher 20+ cm tree BA
+TukeyHSD(aov(mod.20plus), "milpa", conf.level = 0.95)
 
 # Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2d.20plus), "harvested", conf.level = 0.95)
-############################################################################
+TukeyHSD(aov(mod.20plus), "harvested", conf.level = 0.95)
+```

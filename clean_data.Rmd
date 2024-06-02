@@ -1,15 +1,32 @@
-############################################################################
-### PACKAGES AND DATA
+---
+title: "\\textbf{Clean data}"
+author: "\\textbf{Tim White}"
+date: "\\textbf{June 2024}"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Packages and data
+
+```{r message=FALSE, warning=FALSE}
 library(readxl)
 library(tidyverse)
 
 orig_all_data <- read_excel("data/data_raw.xlsx", sheet = "All_data_Categories")
 orig_plots_data <- read_excel("data/data_raw.xlsx", sheet = "Plots_data")
 orig_seedlings_data <- read_excel("data/data_raw.xlsx", sheet = "Seedlings_cut_sprouting_togethe")
-############################################################################
+```
 
-############################################################################
-### STEM-LEVEL DATA
+
+
+# Stem-level data
+
+```{r}
 data_stems <- orig_all_data %>%
                 # Remove unnecessary columns from orig_all_data
                 # Note: Forest'sAge is removed because it is the same as VegetationType
@@ -42,18 +59,19 @@ data_stems <- orig_all_data %>%
                                                     "keelenche" = "Keelenche'",
                                                     "nukuuchche" = "Nuku'uch che'")) %>%
                 # Change the 167 "Maybe" cases for milpa to "No"
-                mutate(milpa = fct_collapse(milpa,
-                                            yes = c("Yes"),
-                                            no = c("Maybe", "No"))) %>%
+                mutate(milpa = fct_collapse(milpa, yes = c("Yes"), no = c("Maybe", "No"))) %>%
                 # Reorder columns
                 select(plot_id, dbh, ba_per_stem, size_class, everything())
 
 # Write to csv
 write_csv(data_stems, "data/data_stems.csv")
-############################################################################
+```
 
-############################################################################
-### PLOT-LEVEL DATA
+
+
+# Plot-level data
+
+```{r}
 data_plots <- orig_plots_data %>%
                 # Remove unnecessary columns from orig_plots_data
                 # Note: Forest'sAge is removed because it is the same as VegetationType
@@ -76,9 +94,7 @@ data_plots <- orig_plots_data %>%
                                                     "keelenche" = "Keelenche'",
                                                     "nukuuchche" = "Nuku'uch che'")) %>%
                 # Change the 167 "Maybe" cases for milpa to "No"
-                mutate(milpa = fct_collapse(milpa,
-                                            yes = c("Yes"),
-                                            no = c("Maybe", "No")))
+                mutate(milpa = fct_collapse(milpa, yes = c("Yes"), no = c("Maybe", "No")))
 
 # Create variables to store basal area (m2/ha) and stem density (stems per ha) for each size class
 ba_by_size_class <- data_stems %>%
@@ -120,29 +136,23 @@ data_plots <- data_plots %>%
                 select(plot_id, harvested, vegetation_type, milpa,
                        starts_with("ba"), starts_with("stemden"))
 
-
 # Check to make sure Milpa is consistent between data_stems and data_plots
-rbind(table(data_stems$milpa, data_stems$plot_id),
-      table(data_plots$milpa, data_plots$plot_id))
+data_stems %>%
+  group_by(plot_id) %>%
+  summarize(stems_milpa = unique(milpa)) %>%
+  left_join(data_plots %>% select(plot_id, plots_milpa = milpa), by = "plot_id") %>%
+  summarize(all(stems_milpa == plots_milpa)) %>% pull()
 
-# Check to make sure that for each plot, total BA = sum of BA of all size
-# classes except seedlings and saplings
-# FALSE if no issues; TRUE if there is at least one issue
-any(abs(round(data_plots$ba_totaltrees -
-                data_plots$ba_trees05to09 -
-                data_plots$ba_trees10to14 - 
-                data_plots$ba_trees15to19 -
-                data_plots$ba_trees20plus, 3)) > 0)
+# Check to make sure that for each plot, total BA = sum of BA of all trees
+data_plots %>% summarize(all(abs(ba_totaltrees - ba_trees05to09 - ba_trees10to14 -
+                                   ba_trees15to19 - ba_trees20plus) < 1e-6)) %>% pull()
 
-# Check to make sure that for each plot, # total stems = sum of # of stems
-# of all size classes except seedlings and saplings
-# FALSE if no issues; TRUE if there is at least one issue
-any(abs(round(data_plots$stemden_totaltrees -
-                data_plots$stemden_trees05to09 -
-                data_plots$stemden_trees10to14 - 
-                data_plots$stemden_trees15to19 -
-                data_plots$stemden_trees20plus, 3)) > 0)
+# Check to make sure that for each plot, # total trees = sum of all trees
+data_plots %>% summarize(all(abs(stemden_totaltrees - stemden_trees05to09 - stemden_trees10to14 -
+                                   stemden_trees15to19 - stemden_trees20plus) < 1e-6)) %>% pull()
 
 # Write to csv
 write_csv(data_plots, "data/data_plots.csv")
-############################################################################
+```
+
+
