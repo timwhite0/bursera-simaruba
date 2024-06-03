@@ -1,0 +1,588 @@
+---
+title: "\\textbf{Final models}"
+author: "\\textbf{Tim White}"
+date: "\\textbf{June 2024}"
+output: pdf_document
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "pdfs") })
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
+                      fig.height=3, fig.width=5, fig.align='center')
+options(knitr.kable.NA = "")
+```
+
+
+
+# Packages, data, and functions
+
+```{r}
+library(car)
+library(tidyverse)
+library(knitr)
+
+data_stems <- read_csv("data/data_stems.csv") %>%
+                mutate(plot_id = as.factor(plot_id),
+                       size_class = as.factor(size_class),
+                       harvested = as.factor(harvested),
+                       vegetation_type = as.factor(vegetation_type),
+                       milpa = as.factor(milpa))
+data_plots <- read_csv("data/data_plots.csv") %>%
+                mutate(plot_id = as.factor(plot_id),
+                       harvested = as.factor(harvested),
+                       vegetation_type = as.factor(vegetation_type),
+                       milpa = as.factor(milpa))
+
+summarize_lm <- function(mod) {
+  summary <- summary(mod)
+  table <- tibble(var = c("Intercept", "harvestedYes", "vegetationKeelenche",
+                          "vegetationNukuuchche", "milpaYes", "harvestedYes:vegetationKeelenche",
+                          "harvestedYes:vegetationNukuuchche", "harvestedYes:milpaYes"),
+                  coef = summary$coefficients[,1], se = summary$coefficients[,2],
+                  t = summary$coefficients[,3], p = summary$coefficients[,4]) %>%
+              mutate_if(is.numeric, function(col) {round(col, 2)}) %>%
+              kable(col.names = c("", "Coefficient", "SE", "t-statistic", "p-value"), align = "c")
+  return(table)
+}
+
+summarize_anova <- function(mod) {
+  summary <- Anova(mod)
+  table <- tibble(var = c("harvested", "vegetation", "milpa", "harvested:vegetation",
+                          "harvested:milpa", "residuals"),
+                  ss = summary$`Sum Sq`, df = summary$Df,
+                  f = summary$`F value`, p = summary$`Pr(>F)`) %>%
+              mutate_if(is.numeric, function(col) {round(col, 2)}) %>%
+              kable(col.names = c("", "SS", "df", "F-statistic", "p-value"), align = "c")
+  return(table)
+}
+```
+
+
+
+# Stem density
+
+### Model
+
+$$
+\begin{aligned}
+\log\text{(total trees per ha)} \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod <- lm(log(stemden_totaltrees) ~ harvested + vegetation_type + milpa +
+                                              harvested:vegetation_type + harvested:milpa,
+                  data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod)
+```
+
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod)
+```
+
+
+
+\newpage
+
+# Stem density by size class
+
+## Seedlings
+
+### Model
+
+$$
+\begin{aligned}
+\log\text{(seedlings per ha)} \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod_seedlings <- lm(log(stemden_seedlings) ~ harvested + vegetation_type + milpa +
+                                                     harvested:vegetation_type + harvested:milpa,
+                            data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod_seedlings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod_seedlings)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod_seedlings)
+```
+
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod_seedlings)
+```
+
+
+
+\newpage
+
+## Saplings (0-4 cm DBH)
+
+### Model
+
+$$
+\begin{aligned}
+\log\text{(saplings per ha)} \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod_saplings <- lm(log(stemden_saplings) ~ harvested + vegetation_type + milpa +
+                                                   harvested:vegetation_type + harvested:milpa,
+                            data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod_saplings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod_saplings)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod_saplings)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod_saplings)
+```
+
+
+
+\newpage
+
+## Trees (5-9 cm DBH)
+
+### Model
+
+$$
+\begin{aligned}
+\log\text{(5-9 cm trees per ha)} \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod_trees05to09 <- lm(log(stemden_trees05to09) ~ harvested + vegetation_type + milpa +
+                                                         harvested:vegetation_type + harvested:milpa,
+                              data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod_trees05to09, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod_trees05to09)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod_trees05to09)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod_trees05to09)
+```
+
+
+
+\newpage
+
+## Trees (10-14 cm DBH)
+
+### Model
+
+$$
+\begin{aligned}
+\text{10-14 cm trees per ha} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod_trees10to14 <- lm(stemden_trees10to14 ~ harvested + vegetation_type + milpa +
+                                                    harvested:vegetation_type + harvested:milpa,
+                              data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod_trees10to14, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod_trees10to14)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod_trees10to14)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod_trees10to14)
+```
+
+
+
+\newpage
+
+## Trees (15-19 cm DBH)
+
+$$
+\begin{aligned}
+\text{15-19 cm trees per ha} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod_trees15to19 <- lm(stemden_trees15to19 ~ harvested + vegetation_type + milpa +
+                                                    harvested:vegetation_type + harvested:milpa,
+                              data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod_trees15to19, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod_trees15to19)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod_trees15to19)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod_trees15to19)
+```
+
+
+
+\newpage
+
+## Trees (20+ cm DBH)
+
+$$
+\begin{aligned}
+\text{20+ cm trees per ha} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+stemden_mod_trees20plus <- lm(stemden_trees20plus ~ harvested + vegetation_type + milpa +
+                                                    harvested:vegetation_type + harvested:milpa,
+                              data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(stemden_mod_trees20plus, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(stemden_mod_trees20plus)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(stemden_mod_trees20plus)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(stemden_mod_trees20plus)
+```
+
+
+
+\newpage
+
+# Basal area
+
+### Model
+
+$$
+\begin{aligned}
+\text{total tree BA (m2/ha)} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+ba_mod <- lm(ba_totaltrees ~ harvested + vegetation_type + milpa +
+                             harvested:vegetation_type + harvested:milpa,
+             data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(ba_mod, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(ba_mod)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(ba_mod)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(ba_mod)
+```
+
+
+
+\newpage
+
+# Basal area by size class
+
+## Saplings (0-4 cm DBH)
+
+### Model
+
+$$
+\begin{aligned}
+\log\text{(sapling BA (m2/ha))} \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+ba_mod_saplings <- lm(log(ba_saplings) ~ harvested + vegetation_type + milpa +
+                                         harvested:vegetation_type + harvested:milpa,
+                      data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(ba_mod_saplings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(ba_mod_saplings)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(ba_mod_saplings)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(ba_mod_saplings)
+```
+
+
+
+\newpage
+
+## Trees (5-9 cm DBH)
+
+### Model
+
+$$
+\begin{aligned}
+\log\text{(5-9 cm tree BA (m2/ha))} \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+ba_mod_trees05to09 <- lm(log(ba_trees05to09) ~ harvested + vegetation_type + milpa +
+                                               harvested:vegetation_type + harvested:milpa,
+                         data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(ba_mod_trees05to09, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(ba_mod_trees05to09)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(ba_mod_trees05to09)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(ba_mod_trees05to09)
+```
+
+
+
+\newpage
+
+## Trees (10-14 cm DBH)
+
+$$
+\begin{aligned}
+\text{10-14 cm tree BA (m2/ha)} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+ba_mod_trees10to14 <- lm(ba_trees10to14 ~ harvested + vegetation_type + milpa +
+                                          harvested:vegetation_type + harvested:milpa,
+                         data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(ba_mod_trees10to14, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(ba_mod_trees10to14)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(ba_mod_trees10to14)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(ba_mod_trees10to14)
+```
+
+
+
+\newpage
+
+## Trees (15-19 cm DBH)
+
+$$
+\begin{aligned}
+\text{15-19 cm tree BA (m2/ha)} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+ba_mod_trees15to19 <- lm(ba_trees15to19 ~ harvested + vegetation_type + milpa +
+                                          harvested:vegetation_type + harvested:milpa,
+                         data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(ba_mod_trees15to19, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(ba_mod_trees15to19)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(ba_mod_trees15to19)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(ba_mod_trees15to19)
+```
+
+
+
+\newpage
+
+## Trees (20+ cm DBH)
+
+$$
+\begin{aligned}
+\text{20+ cm tree BA (m2/ha)} \thinspace \sim \thinspace &\beta_0 + \beta_1 \cdot \text{harvestedYes} + \beta_2 \cdot \text{vegetationKeelenche} + \beta_3 \cdot \text{vegetationNukuuchche} \\ &+ \beta_4 \cdot \text{milpaYes} + \beta_5 \cdot \text{harvestedYes:vegetationKeelenche} \\ &+ \beta_6 \cdot \text{harvestedYes:vegetationNukuuchche} + \beta_7 \cdot \text{harvestedYes:milpaYes} + \varepsilon
+\end{aligned}
+$$
+
+```{r echo = FALSE}
+ba_mod_trees20plus <- lm(ba_trees20plus ~ harvested + vegetation_type + milpa +
+                                          harvested:vegetation_type + harvested:milpa,
+                         data = data_plots)
+```
+
+### Diagnostic plots
+
+```{r echo = FALSE}
+par(mfrow = c(1,2))
+plot(ba_mod_trees20plus, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
+```
+
+### Linear regression output
+
+This model has an $R^2$ of `r round(summary(ba_mod_trees20plus)$r.squared, 3)`.
+
+```{r echo = FALSE}
+summarize_lm(ba_mod_trees20plus)
+```
+
+### ANOVA output
+
+```{r echo = FALSE}
+summarize_anova(ba_mod_trees20plus)
+```
+
+

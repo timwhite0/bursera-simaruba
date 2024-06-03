@@ -3,6 +3,8 @@ title: "\\textbf{Clean data}"
 author: "\\textbf{Tim White}"
 date: "\\textbf{June 2024}"
 output: pdf_document
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "pdfs") })
 ---
 
 ```{r setup, include=FALSE}
