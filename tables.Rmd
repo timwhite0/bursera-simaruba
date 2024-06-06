@@ -1,0 +1,118 @@
+---
+title: "\\textbf{Tables}"
+author: "\\textbf{Tim White}"
+date: "\\textbf{June 2024}"
+output: pdf_document
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "pdfs") })
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
+                      fig.height=3, fig.width=5, fig.align='center')
+options(knitr.kable.NA = "")
+```
+
+
+
+# Packages and data
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(knitr)
+
+data_stems <- read_csv("data/data_stems.csv") %>%
+                mutate(plot_id = as.factor(plot_id),
+                       size_class = as.factor(size_class),
+                       harvested = as.factor(harvested),
+                       vegetation_type = as.factor(vegetation_type),
+                       milpa = as.factor(milpa))
+data_plots <- read_csv("data/data_plots.csv") %>%
+                mutate(plot_id = as.factor(plot_id),
+                       harvested = as.factor(harvested),
+                       vegetation_type = as.factor(vegetation_type),
+                       milpa = as.factor(milpa))
+```
+
+
+
+\small
+
+# Artisans and plot types
+
+```{r echo = FALSE}
+read_excel("data/data_raw.xlsx", sheet = "Plots_data") %>%
+  mutate(Harvested = fct_relevel(Harvested, "Yes", "No")) %>%
+  mutate(Harvested = fct_recode(Harvested,
+                                Harvested = "Yes", Unharvested = "No")) %>%
+  count(Artesanos, Harvested) %>%
+  pivot_wider(names_from = Harvested, values_from = n) %>%
+  kable(align="c")
+```
+
+
+
+\newpage
+
+# Summary of categorical variables
+
+```{r echo = FALSE}
+data_plots %>%
+  mutate(harvested = fct_relevel(harvested, "yes", "no")) %>%
+  count(harvested, vegetation_type, milpa) %>%
+  pivot_wider(names_from = c(vegetation_type, milpa),
+              values_from = n) %>%
+  mutate(juuche_no = c(0,0), .before = juuche_yes) %>%
+  mutate(harvested = fct_recode(harvested, Harvested = "yes", Unharvested = "no")) %>%
+  select(" " = harvested,
+         "Nuku'uch che', milpa" = "nukuuchche_yes",
+         "Nuku'uch che', no milpa" = "nukuuchche_no",
+         "Keelenche', milpa" = "keelenche_yes",
+         "Keelenche', no milpa" = "keelenche_no",
+         "Ju'uche', milpa" = "juuche_yes",
+         "Ju'uche', no milpa" = "juuche_no") %>%
+  janitor::adorn_totals(where = c("row", "col")) %>%
+  kable(align="c")
+```
+
+
+
+# Summary of stem density (stems per hectare)
+
+```{r echo = FALSE}
+data_plots %>%
+  select(stemden_seedlings, stemden_saplings, stemden_trees05to09, stemden_trees10to14) %>%
+  summary() %>%
+  kable(col.names = c("Seedlings", "Saplings",
+                      "Trees (5-9 cm DBH)", "Trees (10-14 cm DBH)"),
+        align = "c")
+
+data_plots %>%
+  select(stemden_trees15to19, stemden_trees20plus, stemden_totaltrees) %>%
+  summary() %>%
+  kable(col.names = c("Trees (15-19 cm DBH)", "Trees (20+ cm DBH)", "All trees"),
+        align = "c")
+```
+
+
+
+# Summary of basal area (m2 per hectare)
+
+```{r echo = FALSE}
+data_plots %>%
+  select(ba_seedlings, ba_saplings, ba_trees05to09, ba_trees10to14) %>%
+  summary() %>%
+  kable(col.names = c("Seedlings", "Saplings",
+                      "Trees (5-9 cm DBH)", "Trees (10-14 cm DBH)"),
+        align = "c")
+
+data_plots %>%
+  select(ba_trees15to19, ba_trees20plus, ba_totaltrees) %>%
+  summary() %>%
+  kable(col.names = c("Trees (15-19 cm DBH)", "Trees (20+ cm DBH)", "All trees"),
+        align = "c")
+```
+
+
+
