@@ -30,16 +30,16 @@ orig_seedlings_data <- read_excel("data/data_raw.xlsx", sheet = "Seedlings_cut_s
 
 ```{r}
 data_stems <- orig_all_data %>%
-                # Remove unnecessary columns from orig_all_data
+                # Remove unnecessary columns
                 # Note: Forest'sAge is removed because it is the same as VegetationType
-                # Note: Artesanos is removed since we are not using it at all,
-                #       and SoilType is removed per Florencia's request
+                # Note: SoilType is removed per Florencia's request
                 select(plot_id = `Plot #`,
                        dbh = `DBH (cm)`,
                        ba_per_stem = `BasalArea per tree m2 ha-1`,
                        harvested = Harvested,
                        vegetation_type = VegetationType,
-                       milpa = `Milpa(has it been milpa)`) %>%
+                       milpa = `Milpa(has it been milpa)`,
+                       artisan = Artesanos) %>%
                 # Add column for size class
                 mutate(size_class = case_when(
                   dbh <= 4 ~ "sapling",
@@ -53,7 +53,8 @@ data_stems <- orig_all_data %>%
                        harvested = as.factor(harvested),
                        vegetation_type = as.factor(vegetation_type),
                        milpa = as.factor(milpa),
-                       size_class = as.factor(size_class)) %>%
+                       size_class = as.factor(size_class),
+                       artisan = as.factor(artisan)) %>%
                 # Clean up factor levels
                 mutate(harvested = fct_recode(harvested, "yes" = "Yes", "no" = "No"),
                        vegetation_type = fct_recode(vegetation_type,
@@ -75,20 +76,30 @@ write_csv(data_stems, "data/data_stems.csv")
 
 ```{r}
 data_plots <- orig_plots_data %>%
-                # Remove unnecessary columns from orig_plots_data
+                # Remove unnecessary columns
                 # Note: Forest'sAge is removed because it is the same as VegetationType
-                # Note: Artesanos is removed since we are not using it at all,
-                #       and SoilType is removed per Florencia's request
+                # Note: SoilType is removed per Florencia's request
                 select(plot_id = `Plot #ID`,
                        ba_totaltrees = `Basal Area (m2/ha-1)`,
                        harvested = Harvested,
                        vegetation_type = VegetationType,
-                       milpa = `Milpa(has it been milpa)`) %>%
+                       milpa = `Milpa(has it been milpa)`,
+                       artisan = Artesanos,
+                       N, W) %>%
                 # Convert variables to factors
                 mutate(plot_id = as.factor(plot_id),
                        harvested = as.factor(harvested),
                        vegetation_type = as.factor(vegetation_type),
-                       milpa = as.factor(milpa)) %>%
+                       milpa = as.factor(milpa),
+                       artisan = as.factor(artisan)) %>%
+                # Convert coordinates to decimals
+                extract(N, into = c("Nh", "Nm", "Ns"), regex = "(\\d{2})'(\\d{2})''(\\d{2}(?:\\.\\d+)?)") %>%
+                mutate(Nh = as.numeric(Nh), Nm = as.numeric(Nm), Ns = as.numeric(Ns)) %>%
+                mutate(latitude = Nh + Nm/60 + Ns/3600) %>%
+                extract(W, into = c("Wh", "Wm", "Ws"), regex = "(\\d{2})'\\s*(\\d{2})''(\\d{2}(?:\\.\\d+)?)") %>%
+                mutate(Wh = as.numeric(Wh), Wm = as.numeric(Wm), Ws = as.numeric(Ws)) %>%
+                mutate(longitude = -(Wh + Wm/60 + Ws/3600)) %>%
+                select(-Nh, -Nm, -Ns, -Wh, -Wm, -Ws) %>%
                 # Clean up factor levels
                 mutate(harvested = fct_recode(harvested, "yes" = "Yes", "no" = "No"),
                        vegetation_type = fct_recode(vegetation_type,
@@ -136,6 +147,7 @@ data_plots <- data_plots %>%
                 # Total BA for each plot should not include sapling BA
                 mutate(ba_totaltrees = ba_totaltrees - ba_saplings) %>%
                 select(plot_id, harvested, vegetation_type, milpa,
+                       artisan, latitude, longitude,
                        starts_with("ba"), starts_with("stemden"))
 
 # Check to make sure Milpa is consistent between data_stems and data_plots
