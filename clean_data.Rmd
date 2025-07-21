@@ -100,6 +100,9 @@ data_plots <- orig_plots_data %>%
                 mutate(Wh = as.numeric(Wh), Wm = as.numeric(Wm), Ws = as.numeric(Ws)) %>%
                 mutate(longitude = -(Wh + Wm/60 + Ws/3600)) %>%
                 select(-Nh, -Nm, -Ns, -Wh, -Wm, -Ws) %>%
+                # Standardize latitude and longitude
+                mutate(latitude = (latitude - mean(latitude)) / sd(latitude),
+                       longitude = (longitude - mean(longitude)) / sd(longitude)) %>%
                 # Clean up factor levels
                 mutate(harvested = fct_recode(harvested, "yes" = "Yes", "no" = "No"),
                        vegetation_type = fct_recode(vegetation_type,
