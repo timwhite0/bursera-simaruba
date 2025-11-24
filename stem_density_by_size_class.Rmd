@@ -84,18 +84,17 @@ boot_intervals <- bind_rows(compute_bootstrap_interval(unharvested$stemden_seedl
                             compute_bootstrap_interval(unharvested$stemden_saplings),
                             compute_bootstrap_interval(unharvested$stemden_trees05to09),
                             compute_bootstrap_interval(unharvested$stemden_trees10to14),
-                            compute_bootstrap_interval(unharvested$stemden_trees15to19),
-                            compute_bootstrap_interval(unharvested$stemden_trees20plus),
+                            compute_bootstrap_interval(unharvested$stemden_trees15plus),
                             compute_bootstrap_interval(harvested$stemden_seedlings),
                             compute_bootstrap_interval(harvested$stemden_saplings),
                             compute_bootstrap_interval(harvested$stemden_trees05to09),
                             compute_bootstrap_interval(harvested$stemden_trees10to14),
-                            compute_bootstrap_interval(harvested$stemden_trees15to19),
-                            compute_bootstrap_interval(harvested$stemden_trees20plus))
+                            compute_bootstrap_interval(harvested$stemden_trees15plus))
 
 stemden_mean_data <- data_plots %>%
                       select(harvested, stemden_seedlings,
                              stemden_saplings, starts_with("stemden_trees")) %>%
+                      select(-contains("_count")) %>%
                       group_by(harvested) %>%
                       summarize_all(mean) %>%
                       pivot_longer(cols = starts_with("stemden"), names_prefix = "stemden_",
@@ -112,8 +111,7 @@ stemden_mean_data_noseedlings <- stemden_mean_data %>%
                                                       "Saplings (0-4 cm DBH)" = "saplings",
                                                       "Trees (5-9 cm DBH)" = "trees05to09",
                                                       "Trees (10-14 cm DBH)" = "trees10to14",
-                                                      "Trees (15-19 cm DBH)" = "trees15to19",
-                                                      "Trees (20+ cm DBH)" = "trees20plus"))
+                                                      "Trees (15+ cm DBH)" = "trees15plus"))
 stemden_mean_data_seedlings <- stemden_mean_data %>%
                                 filter(size_class == "seedlings") %>%
                                 mutate(size_class = fct_recode(size_class,
@@ -215,8 +213,7 @@ stemden_dist_data_noseedlings <- stemden_dist_data %>%
                                                         "Saplings (0-4 cm DBH)" = "saplings",
                                                         "Trees (5-9 cm DBH)" = "trees05to09",
                                                         "Trees (10-14 cm DBH)" = "trees10to14",
-                                                        "Trees (15-19 cm DBH)" = "trees15to19",
-                                                        "Trees (20+ cm DBH)" = "trees20plus"))
+                                                        "Trees (15+ cm DBH)" = "trees15plus"))
 stemden_dist_data_seedlings <- stemden_dist_data %>%
                                 filter(size_class == "seedlings") %>%
                                 mutate(size_class = fct_recode(size_class,
@@ -305,10 +302,7 @@ data_plots %>%
   ggplot() + geom_histogram(aes(x = stemden_trees10to14), bins = 20,
                             col = "black", fill = "gray80") + plot_theme
 data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_trees15to19), bins = 10,
-                            col = "black", fill = "gray80") + plot_theme
-data_plots %>%
-  ggplot() + geom_histogram(aes(x = stemden_trees20plus), bins = 5,
+  ggplot() + geom_histogram(aes(x = stemden_trees15plus), bins = 10,
                             col = "black", fill = "gray80") + plot_theme
 ```
 
@@ -331,13 +325,9 @@ summary(data_plots$stemden_trees10to14)
 data_plots %>% filter(harvested == "yes") %>% pull(stemden_trees10to14) %>% summary()
 data_plots %>% filter(harvested == "no") %>% pull(stemden_trees10to14) %>% summary()
 
-summary(data_plots$stemden_trees15to19)
-data_plots %>% filter(harvested == "yes") %>% pull(stemden_trees15to19) %>% summary()
-data_plots %>% filter(harvested == "no") %>% pull(stemden_trees15to19) %>% summary()
-
-summary(data_plots$stemden_trees20plus)
-data_plots %>% filter(harvested == "yes") %>% pull(stemden_trees20plus) %>% summary()
-data_plots %>% filter(harvested == "no") %>% pull(stemden_trees20plus) %>% summary()
+summary(data_plots$stemden_trees15plus)
+data_plots %>% filter(harvested == "yes") %>% pull(stemden_trees15plus) %>% summary()
+data_plots %>% filter(harvested == "no") %>% pull(stemden_trees15plus) %>% summary()
 ```
 
 ### Box plots, harvesting status
@@ -356,10 +346,7 @@ data_plots %>% ggplot() +
   geom_boxplot(aes(x = harvested, y = stemden_trees10to14),
                col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = stemden_trees15to19),
-               col = "black", fill = "gray80") + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = harvested, y = stemden_trees20plus),
+  geom_boxplot(aes(x = harvested, y = stemden_trees15plus),
                col = "black", fill = "gray80") + plot_theme
 ```
 
@@ -379,10 +366,7 @@ data_plots %>% ggplot() +
   geom_boxplot(aes(x = vegetation_type, y = stemden_trees10to14),
                col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = stemden_trees15to19),
-               col = "black", fill = "gray80") + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = vegetation_type, y = stemden_trees20plus),
+  geom_boxplot(aes(x = vegetation_type, y = stemden_trees15plus),
                col = "black", fill = "gray80") + plot_theme
 ```
 
@@ -402,36 +386,11 @@ data_plots %>% ggplot() +
   geom_boxplot(aes(x = milpa, y = stemden_trees10to14),
                col = "black", fill = "gray80") + plot_theme
 data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = stemden_trees15to19),
-               col = "black", fill = "gray80") + plot_theme
-data_plots %>% ggplot() +
-  geom_boxplot(aes(x = milpa, y = stemden_trees20plus),
+  geom_boxplot(aes(x = milpa, y = stemden_trees15plus),
                col = "black", fill = "gray80") + plot_theme
 ```
 
-### Interaction plots
 
-```{r}
-par(mfrow = c(1,3))
-with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_seedlings)
-                  interaction.plot(milpa, harvested, stemden_seedlings)
-                  interaction.plot(vegetation_type, harvested, stemden_seedlings)})
-with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_saplings)
-                  interaction.plot(milpa, harvested, stemden_saplings)
-                  interaction.plot(vegetation_type, harvested, stemden_saplings)})
-with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_trees05to09)
-                  interaction.plot(milpa, harvested, stemden_trees05to09)
-                  interaction.plot(vegetation_type, harvested, stemden_trees05to09)})
-with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_trees10to14)
-                  interaction.plot(milpa, harvested, stemden_trees10to14)
-                  interaction.plot(vegetation_type, harvested, stemden_trees10to14)})
-with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_trees15to19)
-                  interaction.plot(milpa, harvested, stemden_trees15to19)
-                  interaction.plot(vegetation_type, harvested, stemden_trees15to19)})
-with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_trees20plus)
-                  interaction.plot(milpa, harvested, stemden_trees20plus)
-                  interaction.plot(vegetation_type, harvested, stemden_trees20plus)})
-```
 
 
 
@@ -439,307 +398,151 @@ with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_trees20plus)
 
 ## Seedlings
 
-### Fit model and check assumptions
+### Fit negative binomial model and check residual plots
 
 ```{r}
-mod.2b.seedlings <- lm(stemden_seedlings ~ harvested + vegetation_type + milpa +
-                         harvested:vegetation_type + harvested:milpa, data = data_plots)
+mod_seedlings <- MASS::glm.nb(stemden_seedlings_count ~ harvested + vegetation_type + milpa +
+                                latitude + longitude + offset(log(plots_per_ha)), data = data_plots)
+```
 
+```{r}
 par(mfrow = c(1,2))
-plot(mod.2b.seedlings, which = 1:2)
+plot(mod_seedlings, which = 1:2)
 ```
 
-### Attempt transformation of response
+### Summarize the model
 
 ```{r}
-# There is a megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod.2b.seedlings)
-
-# Box-Cox suggests log transformation; re-fit with logged response
-mod.2b.seedlings.transform <- lm(log(stemden_seedlings) ~ harvested + vegetation_type + milpa +
-                                   harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-# Check constant variance assumption again
-par(mfrow = c(1,2))
-plot(mod.2b.seedlings.transform, which = 1:2)
+summary(mod_seedlings)
 ```
 
-Constant variance and normality assumptions appear to be satisfied now. We proceed with the transformed model.
 
-### Summarize selected model and run ANOVA
 
-```{r}
-# Check for outliers
-outlierTest(mod.2b.seedlings.transform)
-
-# No significant outliers; look at model summary
-summary(mod.2b.seedlings.transform)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2b.seedlings.transform, type = 2)
-```
-
-We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not.
-
-### Pairwise comparisons
+## Construct analysis of deviance table
 
 ```{r}
-# Pairwise comparison for vegetation_type using Tukey HSD
-# Keelenche' has a significantly higher seedling density then Nuku'uch che'
-TukeyHSD(aov(mod.2b.seedlings.transform), "vegetation_type", conf.level = 0.95)
-
-# Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2b.seedlings.transform), "harvested", conf.level = 0.95)
+# Use type 2 SS since data are unbalanced
+Anova(mod_seedlings, type = 2, test.statistic = "LR")
 ```
 
 
 
 ## Saplings (0-4 cm DBH)
 
-### Fit model and check assumptions
+### Fit negative binomial model and check residual plots
 
 ```{r}
-mod.2b.saplings <- lm(stemden_saplings ~ harvested + vegetation_type + milpa +
-                        harvested:vegetation_type + harvested:milpa, data = data_plots)
+mod_saplings <- MASS::glm.nb(stemden_saplings_count ~ harvested + vegetation_type + milpa +
+                                latitude + longitude + offset(log(plots_per_ha)), data = data_plots)
+```
 
+```{r}
 par(mfrow = c(1,2))
-plot(mod.2b.saplings, which = 1:2)
+plot(mod_saplings, which = 1:2)
 ```
 
-### Attempt transformation of response
+### Summarize the model
 
 ```{r}
-# Very distinct megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod.2b.saplings)
-
-# Box-Cox strongly suggests log transformation
-mod.2b.saplings.transform <- lm(log(stemden_saplings) ~ harvested + vegetation_type + milpa +
-                                  harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-# Check constant variance assumption again
-par(mfrow = c(1,2))
-plot(mod.2b.saplings.transform, which = 1:2)
+summary(mod_saplings)
 ```
 
-Assumptions look significantly better, so we will proceed with the transformed model.
 
-### Summarize selected model and run ANOVA
 
-```{r}
-# Check for outliers
-outlierTest(mod.2b.saplings.transform)
-
-# No significant outliers; look at model summary
-summary(mod.2b.saplings.transform)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2b.saplings.transform, type = 2)
-```
-
-We find that vegetation_type and milpa are significant, but harvested and the interaction terms are not.
-
-### Pairwise comparisons
+## Construct analysis of deviance table
 
 ```{r}
-# Pairwise comparison for vegetation_type using Tukey HSD
-# Nuku'uch che' has significantly lower sapling density than Ju'uche' and Keelenche'
-TukeyHSD(aov(mod.2b.saplings.transform), "vegetation_type", conf.level = 0.95)
-
-# Pairwise comparison for milpa using Tukey HSD
-# Plots that have been milpa have higher sapling density
-# (note that the sign flips because of the log transformation)
-TukeyHSD(aov(mod.2b.saplings.transform), "milpa", conf.level = 0.95)
-
-# Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2b.saplings.transform), "harvested", conf.level = 0.95)
+# Use type 2 SS since data are unbalanced
+Anova(mod_saplings, type = 2, test.statistic = "LR")
 ```
 
 
 
 ## Trees (5-9 cm DBH)
 
-### Fit model and check assumptions
+### Fit negative binomial model and check residual plots
 
 ```{r}
-mod.2b.05to09 <- lm(stemden_trees05to09 ~ harvested + vegetation_type + milpa +
-                    harvested:vegetation_type + harvested:milpa, data = data_plots)
+mod_trees05to09 <- MASS::glm.nb(stemden_trees05to09_count ~ harvested + vegetation_type + milpa +
+                                  latitude + longitude + offset(log(plots_per_ha)), data = data_plots)
+```
 
+```{r}
 par(mfrow = c(1,2))
-plot(mod.2b.05to09, which = 1:2)
+plot(mod_trees05to09, which = 1:2)
 ```
 
-### Attempt transformation of response
+### Summarize the model
 
 ```{r}
-# Very distinct megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod.2b.05to09)
-
-# Box-Cox suggests log transformation; re-fit model with logged response
-mod.2b.05to09.transform <- lm(log(stemden_trees05to09) ~ harvested + vegetation_type + milpa +
-                                harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-# Check constant variance assumption again
-par(mfrow = c(1,2))
-plot(mod.2b.05to09.transform, which = 1:2)
+summary(mod_trees05to09)
 ```
 
-Assumptions look significantly better, so we will proceed with the transformed model.
 
-### Summarize selected model and run ANOVA
 
-```{r}
-# Check for outliers
-outlierTest(mod.2b.05to09.transform)
-
-# No significant outliers; look at model summary
-summary(mod.2b.05to09.transform)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2b.05to09.transform, type = 2)
-```
-
-We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not
-
-### Pairwise comparisons
+## Construct analysis of deviance table
 
 ```{r}
-# Pairwise comparison for vegetation_type using Tukey HSD
-# Keelenche' has a significantly higher 5-9 cm tree density then Nuku'uch che'
-TukeyHSD(aov(mod.2b.05to09.transform), "vegetation_type", conf.level = 0.95)
-
-# Confirm lack of significance of Harvested using Tukey HSD
-TukeyHSD(aov(mod.2b.05to09.transform), "harvested", conf.level = 0.95)
+# Use type 2 SS since data are unbalanced
+Anova(mod_trees05to09, type = 2, test.statistic = "LR")
 ```
 
 
 
 ## Trees (10-14 cm DBH)
 
-### Fit model and check assumptions
+### Fit negative binomial model and check residual plots
 
 ```{r}
-mod.2b.10to14 <- lm(stemden_trees10to14 ~ harvested + vegetation_type + milpa +
-                      harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-plot(mod.2b.10to14, which = 1:2)
+mod_trees10to14 <- MASS::glm.nb(stemden_trees10to14_count ~ harvested + vegetation_type + milpa +
+                                latitude + longitude + offset(log(plots_per_ha)), data = data_plots)
 ```
 
-Assumptions appear to be satisfied.
-
-### Summarize selected model and run ANOVA
-
 ```{r}
-# Check for outliers
-outlierTest(mod.2b.10to14)
-
-# No significant outliers; look at model summary
-summary(mod.2b.10to14)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2b.10to14, type = 2)
-```
-
-We find that vegetation_type is significant, but harvested, milpa, and the interaction terms are not.
-
-### Pairwise comparisons
-
-```{r}
-# Pairwise comparison for vegetation_type using Tukey HSD
-# Keelenche' has a significantly higher 10-14 cm tree density then Nuku'uch che'
-TukeyHSD(aov(mod.2b.10to14), "vegetation_type", conf.level = 0.95)
-
-# Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2b.10to14), "harvested", conf.level = 0.95)
-```
-
-
-
-## Trees (15-19 cm DBH)
-
-### Fit model and check assumptions
-
-```{r}
-mod.2b.15to19 <- lm(stemden_trees15to19 ~ harvested + vegetation_type + milpa +
-                      harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-plot(mod.2b.15to19, which = 1:2)
-```
-
-Constant variance and normality assumptions appear to be satisfied.
-
-### Summarize selected model and run ANOVA
-
-```{r}
-# Look at model summary
-summary(mod.2b.15to19)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2b.15to19, type = 2)
-```
-
-We find that no predictors are significant.
-
-### Pairwise comparisons
-
-```{r}
-# Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2b.15to19), "harvested", conf.level = 0.95)
-```
-
-
-
-## Trees (20+ cm DBH)
-
-### Fit model and check assumptions
-
-```{r}
-mod.2b.20plus <- lm(stemden_trees20plus ~ harvested + vegetation_type + milpa +
-                      harvested:vegetation_type + harvested:milpa, data = data_plots)
-
 par(mfrow = c(1,2))
-plot(mod.2b.20plus, which = 1:2)
+plot(mod_trees10to14, which = 1:2)
 ```
 
-There is a little bit of a megaphone shape on the residuals vs. fitted. We can't do a log transformation since the response has zeros, so we'll try a square root transformation.
-
-### Attempt transformation of response
+### Summarize the model
 
 ```{r}
-mod.2b.20plus.transform <- lm(sqrt(stemden_trees20plus) ~ harvested + vegetation_type + milpa +
-                                harvested:vegetation_type + harvested:milpa, data = data_plots)
+summary(mod_trees10to14)
+```
 
-# Check constant variance assumption again
+
+
+## Construct analysis of deviance table
+
+```{r}
+# Use type 2 SS since data are unbalanced
+Anova(mod_trees10to14, type = 2, test.statistic = "LR")
+```
+
+
+
+## Trees (15+ cm DBH)
+
+### Fit negative binomial model and check residual plots
+
+```{r}
+mod_trees15plus <- MASS::glm.nb(stemden_trees15plus_count ~ harvested + vegetation_type + milpa +
+                                latitude + longitude + offset(log(plots_per_ha)), data = data_plots)
+```
+
+```{r}
 par(mfrow = c(1,2))
-plot(mod.2b.20plus.transform, which = 1:2)
+plot(mod_trees15plus, which = 1:2)
 ```
 
-No substantial improvement in assumptions, so we will proceed with the untransformed model.
-
-### Summarize selected model and run ANOVA
+### Summarize the model
 
 ```{r}
-# Look at model summary
-summary(mod.2b.20plus)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.2b.20plus, type = 2)
+summary(mod_trees15plus)
 ```
 
-We find that vegetation type and milpa are significant, but Harvested and the interaction terms are not
-
-### Pairwise comparisons
+## Construct analysis of deviance table
 
 ```{r}
-# Pairwise comparison for vegetation type using Tukey HSD
-# Nuku'uch che' has significantly HIGHER 20+ cm tree density than ju'uche' and keelenche';
-# no significant difference between the latter two
-TukeyHSD(aov(mod.2b.20plus), "vegetation_type", conf.level = 0.95)
-
-# Pairwise comparison for milpa using Tukey HSD
-# Plots that have been milpa have a significantly higher 20+ cm tree density than
-# plots that have not been milpa
-TukeyHSD(aov(mod.2b.20plus), "milpa", conf.level = 0.95)
-
-# Confirm lack of significance of harvested using Tukey HSD
-TukeyHSD(aov(mod.2b.20plus), "harvested", conf.level = 0.95)
+# Use type 2 SS since data are unbalanced
+Anova(mod_trees15plus, type = 2, test.statistic = "LR")
 ```
