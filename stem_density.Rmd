@@ -161,7 +161,9 @@ data_plots %>%
 
 We have fewer than five observations for each artisan, so we elect not to include artisan as a random effect. Also, some individuals appear in more than one level of artisan, so we could not disentangle variability due to each individual.
 
-We decide to fit a negative binomial model with all other covariates, including latitude and longitude. We found that the variance of the residuals increases quadratically with the mean, so we believe a negative binomial model is more appropriate than a quasipoisson GLM.
+We decide to fit a negative binomial model with all other main effects, including latitude and longitude. We found that the variance of the residuals increases quadratically with the mean, so we believe a negative binomial model is more appropriate than a quasipoisson GLM.
+
+We elect not to include the interaction between harvested and milpa or between harvested and vegetation type. Preliminary analyses found that these interactions were insignificant, and we have no ecological reason to believe that these interactions exist. Removing the interactions also enables us to interpret the main effects of harvested and milpa, which are our primary interests. Removing the interactions also enables a cleaner analysis of deviance table — we don't have to worry about a mismatch between the hypothesis tests run by `summary()` and by `Anova()`.
 
 
 
@@ -169,8 +171,7 @@ We decide to fit a negative binomial model with all other covariates, including 
 
 ```{r}
 mod <- MASS::glm.nb(stemden_totaltrees_count ~ harvested + vegetation_type + milpa +
-                         harvested:vegetation_type + harvested:milpa + latitude + longitude +
-                         offset(log(plots_per_ha)), data = data_plots)
+                      latitude + longitude + offset(log(plots_per_ha)), data = data_plots)
 ```
 
 ```{r}
