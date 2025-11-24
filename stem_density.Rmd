@@ -16,10 +16,13 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 
 # Packages and data
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 library(car)
 library(tidyverse)
+library(lme4)
+```
 
+```{r}
 data_stems <- read_csv("data/data_stems.csv") %>%
                 mutate(plot_id = as.factor(plot_id),
                        size_class = as.factor(size_class),
@@ -30,7 +33,15 @@ data_plots <- read_csv("data/data_plots.csv") %>%
                 mutate(plot_id = as.factor(plot_id),
                        harvested = as.factor(harvested),
                        vegetation_type = as.factor(vegetation_type),
-                       milpa = as.factor(milpa))
+                       milpa = as.factor(milpa)) %>%
+                mutate(seedling_plots_per_ha = 20 / 10000,
+                       plots_per_ha = 100 * pi / 10000) %>%
+                mutate(stemden_totaltrees_count = stemden_totaltrees * plots_per_ha,
+                       stemden_seedlings_count = stemden_seedlings * seedling_plots_per_ha,
+                       stemden_saplings_count = stemden_saplings * plots_per_ha,
+                       stemden_trees05to09_count = stemden_trees05to09 * plots_per_ha,
+                       stemden_trees10to14_count = stemden_trees10to14 * plots_per_ha,
+                       stemden_trees15plus_count = stemden_trees15plus * plots_per_ha)
 
 plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     plot.title = element_blank(), 
@@ -141,59 +152,55 @@ with(data_plots, {interaction.plot(vegetation_type, milpa, stemden_totaltrees)
 ```
 
 
+## Latitude and longitude by artisan
+
+```{r}
+data_plots %>%
+  ggplot(aes(x = latitude, y = longitude)) +
+    geom_point(aes(color = artisan), shape = 19) +
+    xlim(-3, 2) +
+    ylim(-3, 2) +
+    theme_bw()
+```
+
+
 
 # Models
 
-## Fit model and check assumptions
+We have fewer than five observations for each artisan, so we elect not to include artisan as a random effect. Also, some individuals appear in more than one level of artisan, so we could not disentangle variability due to each individual.
+
+We decide to fit a negative binomial model with all other covariates, including latitude and longitude. We found that the variance of the residuals increases quadratically with the mean, so we believe a negative binomial model is more appropriate than a quasipoisson GLM.
+
+
+
+## Fit negative binomial model and check residual plots
 
 ```{r}
-mod <- lm(stemden_totaltrees ~ harvested + vegetation_type + milpa +
-              harvested:vegetation_type + harvested:milpa, data = data_plots)
+mod <- MASS::glm.nb(stemden_totaltrees_count ~ harvested + vegetation_type + milpa +
+                         harvested:vegetation_type + harvested:milpa + latitude + longitude +
+                         offset(plots_per_ha), data = data_plots)
+```
 
+```{r}
 par(mfrow = c(1,2))
 plot(mod, which = 1:2)
 ```
 
-## Attempt transformation of response
+
+
+## Summarize the model
 
 ```{r}
-# There is a megaphone shape on the residuals vs. fitted; try Box-Cox
-MASS::boxcox(mod)
-
-# Box-Cox suggests log transformation; re-fit model with logged response
-mod.transform <- lm(log(stemden_totaltrees) ~ harvested + vegetation_type + milpa +
-                        harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-# Check constant variance and normality assumptions again
-par(mfrow = c(1,2))
-plot(mod.transform, which = 1:2)
+summary(mod)
 ```
 
-The assumptions appear to be satisfied now, so we will proceed with the transformed model. Note that we could also fix the assumption violations by removing a significant outlier (plot 19) from the untransformed model. However, we decide to use the log-transform since our sample size is already quite small; if we removed the outlier, it would get even smaller.
 
-## Summarize selected model and run ANOVA
+
+## Construct analysis of deviance table
 
 ```{r}
-# Check for outliers
-outlierTest(mod.transform)
-
-# No significant outliers; look at model summary
-summary(mod.transform)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod.transform, type = 2)
+# Use type 2 SS since data are unbalanced)
+Anova(mod, type = 2, test.statistic = "LR")
 ```
 
-We find that vegetation type is significant, but harvested, milpa, and the interaction terms are not.
 
-## Pairwise comparisons
-
-```{r}
-# Tukey HSD for vegetation type
-# Keelenche' has a significantly higher stem density then Nuku'uch che'
-TukeyHSD(aov(mod.transform), "vegetation_type", conf.level = 0.95)
-
-# Confirm lack of significance of harvested using Tukey HSD
-# Unharvested plots have higher stem density than harvested plots, but difference is not significant
-TukeyHSD(aov(mod.transform), "harvested", conf.level = 0.95)
-```
