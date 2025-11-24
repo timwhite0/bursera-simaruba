@@ -145,8 +145,16 @@ data_plots <- data_plots %>%
                 left_join(stemden_by_size_class, by = "plot_id") %>%
                 # Total BA for each plot should not include sapling BA
                 mutate(ba_totaltrees = ba_totaltrees - ba_saplings) %>%
+                mutate(seedling_plots_per_ha = 20 / 10000,
+                       plots_per_ha = 100 * pi / 10000) %>%
+                mutate(stemden_totaltrees_count = stemden_totaltrees * plots_per_ha,
+                       stemden_seedlings_count = stemden_seedlings * seedling_plots_per_ha,
+                       stemden_saplings_count = stemden_saplings * plots_per_ha,
+                       stemden_trees05to09_count = stemden_trees05to09 * plots_per_ha,
+                       stemden_trees10to14_count = stemden_trees10to14 * plots_per_ha,
+                       stemden_trees15plus_count = stemden_trees15plus * plots_per_ha) %>%
                 select(plot_id, harvested, vegetation_type, milpa,
-                       artisan, latitude, longitude,
+                       artisan, latitude, longitude, plots_per_ha,
                        starts_with("ba"), starts_with("stemden"))
 
 # Check to make sure Milpa is consistent between data_stems and data_plots

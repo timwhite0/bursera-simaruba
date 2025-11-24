@@ -33,15 +33,7 @@ data_plots <- read_csv("data/data_plots.csv") %>%
                 mutate(plot_id = as.factor(plot_id),
                        harvested = as.factor(harvested),
                        vegetation_type = as.factor(vegetation_type),
-                       milpa = as.factor(milpa)) %>%
-                mutate(seedling_plots_per_ha = 20 / 10000,
-                       plots_per_ha = 100 * pi / 10000) %>%
-                mutate(stemden_totaltrees_count = stemden_totaltrees * plots_per_ha,
-                       stemden_seedlings_count = stemden_seedlings * seedling_plots_per_ha,
-                       stemden_saplings_count = stemden_saplings * plots_per_ha,
-                       stemden_trees05to09_count = stemden_trees05to09 * plots_per_ha,
-                       stemden_trees10to14_count = stemden_trees10to14 * plots_per_ha,
-                       stemden_trees15plus_count = stemden_trees15plus * plots_per_ha)
+                       milpa = as.factor(milpa))
 
 plot_theme <- theme(plot.background = element_rect(fill = "white"),
                     plot.title = element_blank(), 
