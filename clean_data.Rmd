@@ -45,8 +45,7 @@ data_stems <- orig_all_data %>%
                   dbh <= 4 ~ "sapling",
                   dbh <= 9 ~ "tree_05to09",
                   dbh <= 14 ~ "tree_10to14",
-                  dbh <= 19 ~ "tree_15to19",
-                  dbh >= 20 ~ "tree_20plus"
+                  dbh >= 15 ~ "tree_15plus",
                 )) %>%
                 # Convert variables to factors
                 mutate(plot_id = as.factor(plot_id),
@@ -123,8 +122,7 @@ ba_by_size_class <- data_stems %>%
                              ba_saplings = sapling,
                              ba_trees05to09 = tree_05to09,
                              ba_trees10to14 = tree_10to14,
-                             ba_trees15to19 = tree_15to19,
-                             ba_trees20plus = tree_20plus)
+                             ba_trees15plus = tree_15plus)
 
 stemden_by_size_class <- data_stems %>%
                           count(plot_id, size_class) %>%
@@ -135,14 +133,12 @@ stemden_by_size_class <- data_stems %>%
                           pivot_wider(names_from = size_class,
                                       values_from = n, values_fill = 0) %>%
                           mutate(stemden_seedlings = orig_seedlings_data$`Seedlings per Ha`,
-                                 stemden_totaltrees = tree_05to09 + tree_10to14 +
-                                                        tree_15to19 + tree_20plus) %>%
+                                 stemden_totaltrees = tree_05to09 + tree_10to14 + tree_15plus) %>%
                           select(plot_id, stemden_seedlings, stemden_totaltrees,
                                  stemden_saplings = sapling,
                                  stemden_trees05to09 = tree_05to09,
                                  stemden_trees10to14 = tree_10to14,
-                                 stemden_trees15to19 = tree_15to19,
-                                 stemden_trees20plus = tree_20plus)
+                                 stemden_trees15plus = tree_15plus)
 
 data_plots <- data_plots %>%
                 left_join(ba_by_size_class, by = "plot_id") %>%
@@ -161,12 +157,10 @@ data_stems %>%
   summarize(all(stems_milpa == plots_milpa)) %>% pull()
 
 # Check to make sure that for each plot, total BA = sum of BA of all trees
-data_plots %>% summarize(all(abs(ba_totaltrees - ba_trees05to09 - ba_trees10to14 -
-                                   ba_trees15to19 - ba_trees20plus) < 1e-6)) %>% pull()
+data_plots %>% summarize(all(abs(ba_totaltrees - ba_trees05to09 - ba_trees10to14 - ba_trees15plus) < 1e-6)) %>% pull()
 
 # Check to make sure that for each plot, # total trees = sum of all trees
-data_plots %>% summarize(all(abs(stemden_totaltrees - stemden_trees05to09 - stemden_trees10to14 -
-                                   stemden_trees15to19 - stemden_trees20plus) < 1e-6)) %>% pull()
+data_plots %>% summarize(all(abs(stemden_totaltrees - stemden_trees05to09 - stemden_trees10to14 - stemden_trees15plus) < 1e-6)) %>% pull()
 
 # Write to csv
 write_csv(data_plots, "data/data_plots.csv")
