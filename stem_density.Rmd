@@ -170,7 +170,7 @@ We decide to fit a negative binomial model with all other covariates, including 
 ```{r}
 mod <- MASS::glm.nb(stemden_totaltrees_count ~ harvested + vegetation_type + milpa +
                          harvested:vegetation_type + harvested:milpa + latitude + longitude +
-                         offset(plots_per_ha), data = data_plots)
+                         offset(log(plots_per_ha)), data = data_plots)
 ```
 
 ```{r}
