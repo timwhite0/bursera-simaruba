@@ -140,7 +140,7 @@ summarize_glm(stemden_mod)
 ```
 
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(stemden_mod, adjusted_p_values[1:5])
@@ -169,7 +169,7 @@ plot(stemden_mod_seedlings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.
 summarize_glm(stemden_mod_seedlings)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(stemden_mod_seedlings, adjusted_p_values[6:10])
@@ -194,7 +194,7 @@ plot(stemden_mod_saplings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.7
 summarize_glm(stemden_mod_saplings)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(stemden_mod_saplings, adjusted_p_values[11:15])
@@ -219,7 +219,7 @@ plot(stemden_mod_trees05to09, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 
 summarize_glm(stemden_mod_trees05to09)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(stemden_mod_trees05to09, adjusted_p_values[16:20])
@@ -242,7 +242,7 @@ plot(stemden_mod_trees10to14, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 
 summarize_glm(stemden_mod_trees10to14)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(stemden_mod_trees10to14, adjusted_p_values[21:25])
@@ -267,7 +267,7 @@ plot(stemden_mod_trees15plus, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 
 summarize_glm(stemden_mod_trees15plus)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(stemden_mod_trees15plus, adjusted_p_values[26:30])
@@ -301,7 +301,7 @@ plot(ba_mod, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption
 summarize_glm(ba_mod)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(ba_mod, adjusted_p_values[31:35])
@@ -330,7 +330,7 @@ plot(ba_mod_saplings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, ce
 summarize_glm(ba_mod_saplings)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(ba_mod_saplings, adjusted_p_values[36:40])
@@ -355,7 +355,7 @@ plot(ba_mod_trees05to09, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75,
 summarize_glm(ba_mod_trees05to09)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(ba_mod_trees05to09, adjusted_p_values[41:45])
@@ -380,7 +380,7 @@ plot(ba_mod_trees10to14, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75,
 summarize_glm(ba_mod_trees10to14)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(ba_mod_trees10to14, adjusted_p_values[46:50])
@@ -405,7 +405,7 @@ plot(ba_mod_trees15plus, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75,
 summarize_glm(ba_mod_trees15plus)
 ```
 
-### Construct analysis of deviance table
+### Analysis of deviance table
 
 ```{r echo = FALSE}
 analysis_of_deviance(ba_mod_trees15plus, adjusted_p_values[51:55])
