@@ -131,65 +131,31 @@ ggsave("figures/ba_fig3.png", height = 4, width = 6)
 ba_fig3
 ```
 
-## Interaction plots
-
-```{r}
-par(mfrow = c(1,3))
-with(data_plots, {interaction.plot(vegetation_type, milpa, ba_totaltrees)
-                  interaction.plot(milpa, harvested, ba_totaltrees)
-                  interaction.plot(vegetation_type, harvested, ba_totaltrees)})
-```
-
-
 
 # Models
 
-## Fit model and check assumptions
+We found that the residuals of a standard linear model had heteroscedastic variance. We considered a Gaussian GLM and a gamma GLM, both with log link. The residuals of the former also had heteroscedastic variance, so we decide to proceed with the latter.
+
+## Fit gamma model and check residual plots
 
 ```{r}
-mod <- lm(ba_totaltrees ~ harvested + vegetation_type + milpa +
-              harvested:vegetation_type + harvested:milpa, data = data_plots)
+mod <- glm(ba_trees15plus ~ harvested + vegetation_type + milpa + latitude + longitude, family = Gamma(link="log"), data = data_plots %>% filter(ba_trees15plus>0))
+```
 
+```{r}
 par(mfrow = c(1,2))
 plot(mod, which = 1:2)
 ```
 
-## Attempt transformation of response
+## Summarize the model
 
 ```{r}
-# Residuals vs. fitted looks pretty good, but we can try Box-Cox just to be safe
-MASS::boxcox(mod)
-
-# Box-Cox suggests log transformation; re-fit model with log response
-mod.transform <- lm(log(ba_totaltrees) ~ harvested + vegetation_type + milpa +
-                        harvested:vegetation_type + harvested:milpa, data = data_plots)
-
-# Check constant variance and normality assumptions
-par(mfrow = c(1,2))
-plot(mod.transform, which = 1:2)
-```
-
-Assumptions look about the same. For the sake of interpretability, we decide to go with the untransformed model.
-
-## Summarize selected model and run ANOVA
-
-```{r}
-# Check for outliers
-outlierTest(mod)
-
-# No significant outliers; look at model summary
 summary(mod)
-
-# Construct ANOVA table (use type 2 SS since data are unbalanced)
-Anova(mod, type = 2)
 ```
 
-We find that no predictors are significant.
-
-## Pairwise comparisons
+## Construct analysis of deviance table
 
 ```{r}
-# Confirm lack of significance of harvested using Tukey HSD
-# Unharvested plots have higher BA than harvested plots, but difference is not significant
-TukeyHSD(aov(mod), "harvested", conf.level = 0.95)
+Anova(mod, type = 2, test.statistic = "LR")
 ```
+
