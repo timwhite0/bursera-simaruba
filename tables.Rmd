@@ -1,7 +1,7 @@
 ---
 title: "\\textbf{Tables}"
 author: "\\textbf{Tim White}"
-date: "\\textbf{June 2024}"
+date: ""
 output: pdf_document
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "pdfs") })
@@ -89,9 +89,9 @@ data_plots %>%
         align = "c")
 
 data_plots %>%
-  select(stemden_trees15to19, stemden_trees20plus, stemden_totaltrees) %>%
+  select(stemden_trees15plus, stemden_totaltrees) %>%
   summary() %>%
-  kable(col.names = c("Trees (15-19 cm DBH)", "Trees (20+ cm DBH)", "All trees"),
+  kable(col.names = c("Trees (15+ cm DBH)", "All trees"),
         align = "c")
 ```
 
@@ -108,9 +108,9 @@ data_plots %>%
         align = "c")
 
 data_plots %>%
-  select(ba_trees15to19, ba_trees20plus, ba_totaltrees) %>%
+  select(ba_trees15plus, ba_totaltrees) %>%
   summary() %>%
-  kable(col.names = c("Trees (15-19 cm DBH)", "Trees (20+ cm DBH)", "All trees"),
+  kable(col.names = c("Trees (15+ cm DBH)", "All trees"),
         align = "c")
 ```
 
