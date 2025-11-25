@@ -297,7 +297,7 @@ Seedlings have zero basal area by definition, so there is no need to fit a model
 
 ## Saplings (0-4 cm DBH)
 
-## Fit gamma model and check residual plots
+### Fit gamma model and check residual plots
 
 ```{r}
 mod_saplings <- glm(ba_saplings ~ harvested + vegetation_type + milpa + latitude + longitude,
@@ -309,13 +309,13 @@ par(mfrow = c(1,2))
 plot(mod_saplings, which = 1:2)
 ```
 
-## Summarize the model
+### Summarize the model
 
 ```{r}
 summary(mod_saplings)
 ```
 
-## Construct analysis of deviance table
+### Construct analysis of deviance table
 
 ```{r}
 Anova(mod_saplings, type = 2, test.statistic = "LR")
@@ -323,7 +323,7 @@ Anova(mod_saplings, type = 2, test.statistic = "LR")
 
 ## Trees (5-9 cm DBH)
 
-## Fit gamma model and check residual plots
+### Fit gamma model and check residual plots
 
 ```{r}
 mod_trees05to09 <- glm(ba_trees05to09 ~ harvested + vegetation_type + milpa + latitude + longitude,
@@ -335,13 +335,13 @@ par(mfrow = c(1,2))
 plot(mod_trees05to09, which = 1:2)
 ```
 
-## Summarize the model
+### Summarize the model
 
 ```{r}
 summary(mod_trees05to09)
 ```
 
-## Construct analysis of deviance table
+### Construct analysis of deviance table
 
 ```{r}
 Anova(mod_trees05to09, type = 2, test.statistic = "LR")
@@ -349,7 +349,7 @@ Anova(mod_trees05to09, type = 2, test.statistic = "LR")
 
 ## Trees (10-14 cm DBH)
 
-## Fit gamma model and check residual plots
+### Fit gamma model and check residual plots
 
 ```{r}
 mod_trees10to14 <- glm(ba_trees10to14 ~ harvested + vegetation_type + milpa + latitude + longitude,
@@ -361,13 +361,13 @@ par(mfrow = c(1,2))
 plot(mod_trees10to14, which = 1:2)
 ```
 
-## Summarize the model
+### Summarize the model
 
 ```{r}
 summary(mod_trees10to14)
 ```
 
-## Construct analysis of deviance table
+### Construct analysis of deviance table
 
 ```{r}
 Anova(mod_trees10to14, type = 2, test.statistic = "LR")
@@ -375,7 +375,7 @@ Anova(mod_trees10to14, type = 2, test.statistic = "LR")
 
 ## Trees (15+ cm DBH)
 
-## Fit gamma model and check residual plots
+### Fit gamma model and check residual plots
 
 There are four plots with zero 15+ cm trees. We decide to drop these four plots; otherwise, we cannot use the gamma GLM.
 
@@ -389,13 +389,13 @@ par(mfrow = c(1,2))
 plot(mod_trees15plus, which = 1:2)
 ```
 
-## Summarize the model
+### Summarize the model
 
 ```{r}
 summary(mod_trees15plus)
 ```
 
-## Construct analysis of deviance table
+### Construct analysis of deviance table
 
 ```{r}
 Anova(mod_trees15plus, type = 2, test.statistic = "LR")
