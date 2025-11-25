@@ -139,7 +139,8 @@ We found that the residuals of a standard linear model had heteroscedastic varia
 ## Fit gamma model and check residual plots
 
 ```{r}
-mod <- glm(ba_trees15plus ~ harvested + vegetation_type + milpa + latitude + longitude, family = Gamma(link="log"), data = data_plots %>% filter(ba_trees15plus>0))
+mod <- glm(ba_totaltrees ~ harvested + vegetation_type + milpa + latitude + longitude,
+           family = Gamma(link="log"), data = data_plots)
 ```
 
 ```{r}
