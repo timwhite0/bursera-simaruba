@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 library(car)
 library(tidyverse)
 library(lme4)
+library(patchwork)
 ```
 
 ```{r}
@@ -132,6 +133,14 @@ stemden_fig3 <- data_plots %>%
   labs(x = "Milpa exposure", y = "Total trees per hectare (log scale)")
 ggsave("figures/stemden_fig3.png", height = 4, width = 6)
 stemden_fig3
+
+# Combined side-by-side box plots
+stemden_fig_combined <- stemden_fig1 +
+  (stemden_fig2 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
+  (stemden_fig3 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
+  plot_layout(ncol = 3)
+ggsave("figures/stemden_fig_combined.png", stemden_fig_combined, height = 4, width = 8)
+stemden_fig_combined
 ```
 
 
@@ -147,6 +156,8 @@ data_plots %>%
 ```
 
 
+
+\newpage
 
 # Models
 
@@ -186,5 +197,3 @@ summary(mod)
 # Use type 2 SS since data are unbalanced)
 Anova(mod, type = 2, test.statistic = "LR")
 ```
-
-

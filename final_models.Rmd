@@ -120,9 +120,7 @@ adjusted_p_values <- p.adjust(p_values, method = "BH")
 ### Model
 
 $$
-\begin{aligned}
-\log E[Y|X] \sim \thinspace &\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \beta_4 X_4 + \beta_5 X_5 + \beta_6 X_6 + \log\text{(plots per ha)}
-\end{aligned}
+\log E[Y|X] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \beta_4 X_4 + \beta_5 X_5 + \beta_6 X_6 + \log\text{(plots per ha)}
 $$
 where $Y$ is the total number of stems per plot and $X = \{X_1,X_2,X_3,X_4,X_5,X_6\}$, where $X_1$ is a binary variable indicating whether a plot has been harvested, $X_2$ and $X_3$ are indicator variables for the Keelenche and Nukuuchche vegetation types, $X_4$ is a binary variable indicating whether a plot has been exposed to milpa, $X_5$ is latitude, and $X_6$ is longitude. We set $\text{Var}(Y|X) = E[Y|X] (1 + \theta E[Y|X])$, where $\theta$ is the negative binomial dispersion parameter.
 
@@ -282,9 +280,7 @@ analysis_of_deviance(stemden_mod_trees15plus, adjusted_p_values[26:30])
 ### Model
 
 $$
-\begin{aligned}
-\log E[Y|X] \sim \thinspace &\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \beta_4 X_4 + \beta_5 X_5 + \beta_6 X_6
-\end{aligned}
+\log E[Y|X] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \beta_4 X_4 + \beta_5 X_5 + \beta_6 X_6
 $$
 where $Y$ is the total basal area per hectare and $X = \{X_1,X_2,X_3,X_4,X_5,X_6\}$, where $X_1$ is a binary variable indicating whether a plot has been harvested, $X_2$ and $X_3$ are indicator variables for the Keelenche and Nukuuchche vegetation types, $X_4$ is a binary variable indicating whether a plot has been exposed to milpa, $X_5$ is latitude, and $X_6$ is longitude. We set $\text{Var}(Y|X) = \phi E[Y|X]^2$, where $\phi$ is the gamma dispersion parameter.
 
@@ -324,7 +320,7 @@ par(mfrow = c(1,2))
 plot(ba_mod_saplings, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
 ```
 
-### Summarize model
+### Model summary
 
 ```{r echo = FALSE}
 summarize_glm(ba_mod_saplings)
@@ -349,7 +345,7 @@ par(mfrow = c(1,2))
 plot(ba_mod_trees05to09, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
 ```
 
-### Summarize model
+### Model summary
 
 ```{r echo = FALSE}
 summarize_glm(ba_mod_trees05to09)
@@ -374,7 +370,7 @@ par(mfrow = c(1,2))
 plot(ba_mod_trees10to14, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
 ```
 
-### Summarize model
+### Model summary
 
 ```{r echo = FALSE}
 summarize_glm(ba_mod_trees10to14)
@@ -399,7 +395,7 @@ par(mfrow = c(1,2))
 plot(ba_mod_trees15plus, which = 1:2, pch = 19, cex.axis = 0.75, cex.lab = 0.75, cex.caption = 0.75)
 ```
 
-### Summarize model
+### Model summary
 
 ```{r echo = FALSE}
 summarize_glm(ba_mod_trees15plus)
@@ -410,5 +406,3 @@ summarize_glm(ba_mod_trees15plus)
 ```{r echo = FALSE}
 analysis_of_deviance(ba_mod_trees15plus, adjusted_p_values[51:55])
 ```
-
-

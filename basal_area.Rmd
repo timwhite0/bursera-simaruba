@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 ```{r}
 library(car)
 library(tidyverse)
+library(patchwork)
 
 data_stems <- read_csv("data/data_stems.csv") %>%
                 mutate(plot_id = as.factor(plot_id),
@@ -129,8 +130,19 @@ ba_fig3 <- data_plots %>%
   labs(x = "Milpa exposure", y = "Total basal area of trees (m2 per hectare)")
 ggsave("figures/ba_fig3.png", height = 4, width = 6)
 ba_fig3
+
+# Combined side-by-side box plots
+ba_fig_combined <- ba_fig1 +
+  (ba_fig2 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
+  (ba_fig3 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
+  plot_layout(ncol = 3)
+ggsave("figures/ba_fig_combined.png", ba_fig_combined, height = 4, width = 8)
+ba_fig_combined
 ```
 
+
+
+\newpage
 
 # Models
 
@@ -159,4 +171,3 @@ summary(mod)
 ```{r}
 Anova(mod, type = 2, test.statistic = "LR")
 ```
-
