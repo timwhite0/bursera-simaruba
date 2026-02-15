@@ -133,7 +133,7 @@ stemden_sizeclass_fig1_noseedlings <- stemden_mean_data_noseedlings %>%
     scale_color_brewer(palette = "Dark2") +
     labs(x = "Size class", y = "Average number of stems per hectare") +
     guides(col=guide_legend(title = "Plot status"))
-ggsave("figures/stemden_sizeclass_fig1_noseedlings.png", height = 4, width = 8)
+ggsave("figures/not_in_manuscript/stem_density_sizeclass_noseedlings_pointrange.png", height = 4, width = 8)
 stemden_sizeclass_fig1_noseedlings
 
 # Seedlings only
@@ -148,7 +148,7 @@ stemden_sizeclass_fig1_seedlings <- stemden_mean_data_seedlings %>%
   scale_color_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average number of stems per hectare") +
   guides(col=guide_legend(title = "Plot status"))
-ggsave("figures/stemden_sizeclass_fig1_seedlings.png", height = 4, width = 8)
+ggsave("figures/not_in_manuscript/stem_density_sizeclass_seedlings_pointrange.png", height = 4, width = 8)
 stemden_sizeclass_fig1_seedlings
 ```
 
@@ -169,7 +169,7 @@ stemden_sizeclass_fig2_noseedlings <- stemden_mean_data_noseedlings %>%
     scale_fill_brewer(palette = "Dark2") +
     labs(x = "Size class", y = "Average number of stems per hectare") +
     guides(fill=guide_legend(title = "Plot status"))
-ggsave("figures/stemden_sizeclass_fig2_noseedlings.png", height = 4, width = 8)
+ggsave("figures/stem_density_sizeclass_noseedlings.png", height = 4, width = 8)
 stemden_sizeclass_fig2_noseedlings
 
 # Seedlings only
@@ -186,7 +186,7 @@ stemden_sizeclass_fig2_seedlings <- stemden_mean_data_seedlings %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average number of stems per hectare") +
   guides(fill=guide_legend(title = "Plot status"))
-ggsave("figures/stemden_sizeclass_fig2_seedlings.png", height = 4, width = 8)
+ggsave("figures/stem_density_sizeclass_seedlings.png", height = 4, width = 8)
 stemden_sizeclass_fig2_seedlings
 ```
 
@@ -264,7 +264,7 @@ stemden_sizeclass_fig3_noseedlings <- stemden_dist_data_noseedlings %>%
     coord_cartesian(ylim = c(0, 1500)) + # 2 outliers not shown
     labs(x = "Size class", y = "Number of stems per hectare") +
     guides(fill = guide_legend(title = "Plot status"))
-ggsave("figures/stemden_sizeclass_fig3_noseedlings.png", height = 4, width = 8)
+ggsave("figures/not_in_manuscript/stem_density_sizeclass_noseedlings_boxplot.png", height = 4, width = 8)
 stemden_sizeclass_fig3_noseedlings
 
 # Seedlings only
@@ -278,7 +278,7 @@ stemden_sizeclass_fig3_seedlings <- stemden_dist_data_seedlings %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Number of stems per hectare") +
   guides(fill = guide_legend(title = "Plot status"))
-ggsave("figures/stemden_sizeclass_fig3_seedlings.png", height = 4, width = 8)
+ggsave("figures/not_in_manuscript/stem_density_sizeclass_seedlings_boxplot.png", height = 4, width = 8)
 stemden_sizeclass_fig3_seedlings
 ```
 

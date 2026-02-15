@@ -100,7 +100,7 @@ propcut_fig1 <- prop_cortado %>%
     plot_theme +
     geom_hline(yintercept = 0) +
     labs(x = "Plot ID", y = "Proportion of individuals that are cut")
-ggsave("figures/propcut_fig1.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/cut_proportion_by_plot.png", height = 4, width = 6)
 propcut_fig1
 
 propcut_fig2 <- prop_cortado %>%
@@ -121,6 +121,6 @@ propcut_fig2 <- prop_cortado %>%
        x = "Plot ID", y = "Number of individuals") +
   geom_hline(yintercept = 0) +
   guides(fill = guide_legend(title = "Status"))
-ggsave("figures/propcut_fig2.png", height = 4, width = 6)
+ggsave("figures/cut_status_by_plot.png", height = 4, width = 6)
 propcut_fig2
 ```

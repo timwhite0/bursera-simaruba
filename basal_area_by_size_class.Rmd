@@ -118,7 +118,7 @@ ba_sizeclass_fig1 <- ba_mean_data %>%
   scale_color_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average basal area (m2 per hectare)") +
   guides(col=guide_legend(title = "Status"))
-ggsave("figures/ba_sizeclass_fig1.png", height = 4, width = 8)
+ggsave("figures/not_in_manuscript/basal_area_sizeclass_pointrange.png", height = 4, width = 8)
 ba_sizeclass_fig1
 ```
 
@@ -137,7 +137,7 @@ ba_sizeclass_fig2 <- ba_mean_data %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Average basal area (m2 per hectare)") +
   guides(fill=guide_legend(title = "Status"))
-ggsave("figures/ba_sizeclass_fig2.png", height = 4, width = 8)
+ggsave("figures/basal_area_sizeclass.png", height = 4, width = 8)
 ba_sizeclass_fig2
 ```
 
@@ -193,7 +193,7 @@ ba_sizeclass_fig3 <- ba_dist_data %>%
   scale_fill_brewer(palette = "Dark2") +
   labs(x = "Size class", y = "Basal area (m2 per hectare)") +
   guides(fill = guide_legend(title = "Status"))
-ggsave("figures/ba_sizeclass_fig3.png", height = 4, width = 8)
+ggsave("figures/not_in_manuscript/basal_area_sizeclass_boxplot.png", height = 4, width = 8)
 ba_sizeclass_fig3
 ```
 

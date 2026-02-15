@@ -101,7 +101,7 @@ stemden_fig1 <- data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(5, 8)) +
   labs(x = "Plot status", y = "Total trees per hectare (log scale)")
-ggsave("figures/stemden_fig1.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/stem_density_harvest_boxplot.png", height = 4, width = 6)
 stemden_fig1
 
 # By vegetation type
@@ -117,7 +117,7 @@ stemden_fig2 <- data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(5, 8)) +
   labs(x = "Vegetation type", y = "Total trees per hectare (log scale)")
-ggsave("figures/stemden_fig2.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/stem_density_vegetation_boxplot.png", height = 4, width = 6)
 stemden_fig2
 
 # By milpa exposure
@@ -131,7 +131,7 @@ stemden_fig3 <- data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(5, 8)) +
   labs(x = "Milpa exposure", y = "Total trees per hectare (log scale)")
-ggsave("figures/stemden_fig3.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/stem_density_milpa_boxplot.png", height = 4, width = 6)
 stemden_fig3
 
 # Combined side-by-side box plots
@@ -139,7 +139,7 @@ stemden_fig_combined <- stemden_fig1 +
   (stemden_fig2 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
   (stemden_fig3 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
   plot_layout(ncol = 3)
-ggsave("figures/stemden_fig_combined.png", stemden_fig_combined, height = 4, width = 8)
+ggsave("figures/stem_density_boxplots.png", stemden_fig_combined, height = 4, width = 8)
 stemden_fig_combined
 ```
 

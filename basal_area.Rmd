@@ -98,7 +98,7 @@ ba_fig1 <- data_plots %>%
     plot_theme +
     coord_cartesian(ylim = c(0, 15)) +
     labs(x = "Plot status", y = "Total basal area of trees (m2 per hectare)")
-ggsave("figures/ba_fig1.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/basal_area_harvest_boxplot.png", height = 4, width = 6)
 ba_fig1
 
 # By vegetation type
@@ -114,7 +114,7 @@ ba_fig2 <- data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(0, 15)) +
   labs(x = "Vegetation type", y = "Total basal area of trees (m2 per hectare)")
-ggsave("figures/ba_fig2.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/basal_area_vegetation_boxplot.png", height = 4, width = 6)
 ba_fig2
 
 # By milpa
@@ -128,7 +128,7 @@ ba_fig3 <- data_plots %>%
   plot_theme +
   coord_cartesian(ylim = c(0, 15)) +
   labs(x = "Milpa exposure", y = "Total basal area of trees (m2 per hectare)")
-ggsave("figures/ba_fig3.png", height = 4, width = 6)
+ggsave("figures/not_in_manuscript/basal_area_milpa_boxplot.png", height = 4, width = 6)
 ba_fig3
 
 # Combined side-by-side box plots
@@ -136,7 +136,7 @@ ba_fig_combined <- ba_fig1 +
   (ba_fig2 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
   (ba_fig3 + labs(y = NULL) + theme(axis.title.y = element_blank())) +
   plot_layout(ncol = 3)
-ggsave("figures/ba_fig_combined.png", ba_fig_combined, height = 4, width = 8)
+ggsave("figures/basal_area_boxplots.png", ba_fig_combined, height = 4, width = 8)
 ba_fig_combined
 ```
 

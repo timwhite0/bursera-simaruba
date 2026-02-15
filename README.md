@@ -30,13 +30,14 @@ Use R (recommended: R 4.2+), with these packages installed:
 - `MASS`
 - `lme4`
 - `janitor`
+- `patchwork`
 
 Install any missing packages with:
 
 ```r
 install.packages(c(
   "rmarkdown", "knitr", "tidyverse", "readxl",
-  "car", "MASS", "lme4", "janitor"
+  "car", "MASS", "lme4", "janitor", "patchwork"
 ))
 ```
 
