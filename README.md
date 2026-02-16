@@ -48,17 +48,17 @@ Run scripts from the repository root (`bursera-simaruba`).
 1. Data cleaning script:
 
 ```r
-rmarkdown::render("clean_data.Rmd")
+rmarkdown::render("clean_data.Rmd", output_dir = "pdfs")
 ```
 
 2. Analysis scripts:
 
 ```r
-rmarkdown::render("stem_density.Rmd")
-rmarkdown::render("basal_area.Rmd")
-rmarkdown::render("stem_density_by_size_class.Rmd")
-rmarkdown::render("basal_area_by_size_class.Rmd")
-rmarkdown::render("proportion_cut.Rmd")
-rmarkdown::render("final_models.Rmd")
-rmarkdown::render("tables.Rmd")
+rmarkdown::render("stem_density.Rmd", output_dir = "pdfs")
+rmarkdown::render("basal_area.Rmd", output_dir = "pdfs")
+rmarkdown::render("stem_density_by_size_class.Rmd", output_dir = "pdfs")
+rmarkdown::render("basal_area_by_size_class.Rmd", output_dir = "pdfs")
+rmarkdown::render("proportion_cut.Rmd", output_dir = "pdfs")
+rmarkdown::render("final_models.Rmd", output_dir = "pdfs")
+rmarkdown::render("tables.Rmd", output_dir = "pdfs")
 ```
