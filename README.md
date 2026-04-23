@@ -1,6 +1,6 @@
 # bursera-simaruba
 
-Data and code for the manuscript "Low intensity selective logging of _Bursera simaruba_ and _milpa_ may help maintain wood supply for handicraft production"
+Code for the Bursera and milpa manuscript
 
 ## Repository contents
 
